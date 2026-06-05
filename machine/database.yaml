@@ -1,0 +1,29 @@
+
+database:
+
+  primary: postgres
+
+  cache: redis
+
+tables:
+
+  - qverse_users
+
+  - qverse_profiles
+
+  - qverse_conversations
+
+  - qverse_projects
+
+  - qverse_models
+
+  - qverse_agents
+
+  - qverse_tools
+
+  - qverse_integrations
+
+  - qverse_settings
+
+  - qverse_logs
+

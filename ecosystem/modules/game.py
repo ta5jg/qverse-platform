@@ -1,0 +1,2 @@
+class GameModule:
+    name = 'game'

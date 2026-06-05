@@ -1,0 +1,35 @@
+
+services:
+
+  - id: nodejs
+
+    status: planned
+
+  - id: docker
+
+    status: planned
+
+  - id: postgres
+
+    status: planned
+
+  - id: redis
+
+    status: planned
+
+  - id: nginx
+
+    status: planned
+
+  - id: certbot
+
+    status: planned
+
+  - id: n8n
+
+    status: planned
+
+  - id: qverse_api
+
+    status: planned
+

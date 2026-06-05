@@ -1,0 +1,54 @@
+{
+  "version": "V9",
+  "created_at": "2026-06-02T19:04:44.289238+00:00",
+  "targets": [
+    {
+      "name": "machine",
+      "path": "machine",
+      "category": "config",
+      "required": false
+    },
+    {
+      "name": "installer",
+      "path": "installer",
+      "category": "code",
+      "required": false
+    },
+    {
+      "name": "docs",
+      "path": "docs",
+      "category": "docs",
+      "required": false
+    },
+    {
+      "name": "root_installer",
+      "path": "qverse_platform_installer_v4.py",
+      "category": "code",
+      "required": false
+    }
+  ],
+  "metadata": {
+    "backup_id": "20260602_190444",
+    "created_at": "2026-06-02T19:04:44.289151+00:00",
+    "checksum": "29dfb1021aba7bfdf7f8cdc7d7edebdb95b6cf0091f005c40efd36a01698dc51",
+    "size_bytes": 96870,
+    "archive_path": ".qverse_backups/backup_20260602_190444.tar.gz"
+  },
+  "verification": {
+    "valid": true,
+    "checksum_match": true,
+    "archive_exists": true,
+    "errors": []
+  },
+  "compliance": {
+    "score": 100,
+    "passed": true,
+    "findings": []
+  },
+  "retention_policy": {
+    "keep_last": 10,
+    "keep_days": 30
+  },
+  "estimated_size_bytes": 315884,
+  "encrypted": false
+}

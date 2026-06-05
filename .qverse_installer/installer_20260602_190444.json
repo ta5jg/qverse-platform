@@ -1,0 +1,187 @@
+{
+  "started_at": "2026-06-02T19:04:44.227677+00:00",
+  "completed_at": "2026-06-02T19:04:44.289731+00:00",
+  "success": true,
+  "mode": "repair",
+  "environment": "development",
+  "dry_run": true,
+  "runtime": {
+    "platform": "Q-Verse",
+    "version": "4.0.0",
+    "status": "V9_ENTERPRISE_COMPLETE",
+    "engines": [
+      "audit",
+      "backup",
+      "config",
+      "logger"
+    ],
+    "versions": {
+      "config": "V9",
+      "audit": "V9",
+      "backup": "V9",
+      "logger": "V9"
+    },
+    "dependencies": {
+      "config": [],
+      "audit": [
+        "config"
+      ],
+      "backup": [
+        "logger"
+      ],
+      "logger": []
+    },
+    "capabilities": {
+      "config": [
+        "yaml_loading",
+        "desired_state",
+        "validation",
+        "dependency_validation",
+        "config_diff",
+        "config_export",
+        "checksum"
+      ],
+      "audit": [
+        "service_audit",
+        "security_audit",
+        "database_audit",
+        "risk_analysis",
+        "compliance_scoring",
+        "action_planning",
+        "report_export"
+      ],
+      "backup": [
+        "archive_backup",
+        "checksum_verification",
+        "restore",
+        "retention_policy",
+        "disaster_recovery",
+        "aes256_encryption",
+        "s3_upload",
+        "minio_upload",
+        "postgres_dump",
+        "redis_snapshot",
+        "scheduler_definition"
+      ],
+      "logger": [
+        "event_logging",
+        "audit_trail",
+        "security_events",
+        "metrics",
+        "alerts",
+        "log_rotation",
+        "retention",
+        "prometheus_export",
+        "opentelemetry_hook",
+        "remote_sink"
+      ]
+    },
+    "health": {
+      "config": {
+        "name": "config",
+        "available": true,
+        "status": "stable",
+        "version": "V9",
+        "errors": []
+      },
+      "audit": {
+        "name": "audit",
+        "available": true,
+        "status": "stable",
+        "version": "V9",
+        "errors": []
+      },
+      "backup": {
+        "name": "backup",
+        "available": true,
+        "status": "V9_ENTERPRISE_COMPLETE",
+        "version": "V9",
+        "errors": []
+      },
+      "logger": {
+        "name": "logger",
+        "available": true,
+        "status": "V9_ENTERPRISE_COMPLETE",
+        "version": "V9",
+        "errors": []
+      }
+    }
+  },
+  "plan": {
+    "mode": "repair",
+    "environment": "development",
+    "dry_run": true,
+    "actions": [
+      {
+        "name": "configure_ssl",
+        "category": "security",
+        "command": "certbot --nginx",
+        "risk": "medium",
+        "requires_backup": true,
+        "executed": false,
+        "success": true,
+        "output": "dry-run"
+      },
+      {
+        "name": "install_firewall",
+        "category": "security",
+        "command": "apt-get install ufw -y",
+        "risk": "low",
+        "requires_backup": false,
+        "executed": false,
+        "success": true,
+        "output": "dry-run"
+      },
+      {
+        "name": "configure_backup_system",
+        "category": "backup",
+        "command": "configure qverse backups",
+        "risk": "medium",
+        "requires_backup": false,
+        "executed": false,
+        "success": true,
+        "output": "dry-run"
+      },
+      {
+        "name": "deploy_or_restart_qverse_api",
+        "category": "api",
+        "command": "systemctl restart qverse-ai-api",
+        "risk": "low",
+        "requires_backup": false,
+        "executed": false,
+        "success": true,
+        "output": "dry-run"
+      },
+      {
+        "name": "install_admin_panel",
+        "category": "frontend",
+        "command": "build and deploy admin panel",
+        "risk": "medium",
+        "requires_backup": true,
+        "executed": false,
+        "success": true,
+        "output": "dry-run"
+      }
+    ],
+    "backup_required": true,
+    "rollback_available": true
+  },
+  "validation": {
+    "passed": true,
+    "checks": {
+      "runtime_available": true,
+      "plan_generated": true,
+      "actions_sane": true
+    },
+    "errors": []
+  },
+  "summary": {
+    "installer_version": "V4",
+    "installer_status": "V9_ENTERPRISE_ORCHESTRATOR",
+    "audit_score": 12,
+    "findings": 5,
+    "actions": 5,
+    "backup_created": true,
+    "validation_passed": true
+  }
+}

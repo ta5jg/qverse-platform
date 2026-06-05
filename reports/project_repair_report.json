@@ -1,0 +1,10 @@
+{
+  "status": "healthy",
+  "empty_count": 0,
+  "placeholder_count": 0,
+  "critical_count": 0,
+  "total_files": 536,
+  "empty_files": [],
+  "placeholder_files": [],
+  "critical_files": []
+}

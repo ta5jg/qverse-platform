@@ -1,0 +1,2 @@
+class MarketplaceModule:
+    name = 'marketplace'

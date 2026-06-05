@@ -1,0 +1,17 @@
+environment: development
+logging:
+  level: debug
+security:
+  require_https: false
+  allow_localhost: true
+runtime:
+  reload: true
+  workers: 1
+backup:
+  enabled: false
+monitoring:
+  enabled: true
+agent:
+  mode: local
+ai:
+  provider_mode: mock_or_local

@@ -1,0 +1,19 @@
+
+installer:
+
+  version: 4.0.0
+
+  mode: idempotent
+
+behavior:
+
+  fresh_install: true
+
+  upgrade_existing: true
+
+  repair_missing: true
+
+  preserve_data: true
+
+  backup_before_changes: true
+

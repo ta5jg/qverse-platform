@@ -1,0 +1,18 @@
+environment: production
+logging:
+  level: warning
+security:
+  require_https: true
+  allow_localhost: false
+runtime:
+  reload: false
+  workers: 4
+backup:
+  enabled: true
+  retention_days: 30
+monitoring:
+  enabled: true
+agent:
+  mode: enterprise
+ai:
+  provider_mode: managed

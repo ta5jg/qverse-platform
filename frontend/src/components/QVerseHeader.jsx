@@ -1,0 +1,1 @@
+export default function QVerseHeader(){return <header>Q-Verse</header>}

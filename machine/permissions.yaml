@@ -1,0 +1,12 @@
+roles:
+  - id: owner
+    permissions:
+      - "*"
+  - id: admin
+    permissions:
+      - read
+      - write
+      - deploy
+  - id: viewer
+    permissions:
+      - read

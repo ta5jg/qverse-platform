@@ -1,0 +1,2 @@
+HEALTH_SCORE = 100
+STATUS = 'healthy'

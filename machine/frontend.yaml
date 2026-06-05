@@ -1,0 +1,31 @@
+
+frontend:
+
+  framework: react
+
+  bundler: vite
+
+  styling: tailwind
+
+  pages:
+
+    - dashboard
+
+    - projects
+
+    - memory
+
+    - models
+
+    - agents
+
+    - integrations
+
+    - docker
+
+    - system
+
+    - installer
+
+    - settings
+

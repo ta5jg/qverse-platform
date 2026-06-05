@@ -1,0 +1,2 @@
+{"name": "cpu_usage", "value": 91, "timestamp": "2026-06-02T18:39:17.832668+00:00", "labels": {"host": "local"}}
+{"name": "cpu_usage", "value": 95, "timestamp": "2026-06-02T18:39:17.832789+00:00", "labels": {}}

@@ -1,0 +1,19 @@
+modules:
+  - id: core
+    status: planned
+  - id: database_memory
+    status: planned
+  - id: api_gateway
+    status: planned
+  - id: admin_panel
+    status: planned
+  - id: model_router
+    status: planned
+  - id: agent_orchestrator
+    status: planned
+  - id: tool_engine
+    status: planned
+  - id: project_manager
+    status: planned
+  - id: integration_hub
+    status: planned

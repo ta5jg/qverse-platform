@@ -1,0 +1,7 @@
+integrations:
+  - id: telegram
+  - id: signal
+  - id: discord
+  - id: slack
+  - id: whatsapp
+  - id: email

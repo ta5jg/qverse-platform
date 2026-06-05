@@ -1,0 +1,68 @@
+project:
+  name: Q-Verse Platform
+  version: 4.0.0
+
+modules:
+
+  architecture_contract:
+    status: stable
+
+  core:
+    status: development
+
+  database_memory:
+    status: planned
+
+  api_gateway:
+    status: planned
+
+  admin_panel:
+    status: planned
+
+  model_router:
+    status: planned
+
+  agent_orchestrator:
+    status: planned
+
+  tool_engine:
+    status: planned
+
+  project_manager:
+    status: planned
+
+  integration_hub:
+    status: planned
+
+  security:
+    status: planned
+
+  backup_restore:
+    status: planned
+
+  monitoring_logs:
+    status: planned
+
+  deployment:
+    status: planned
+
+  installer_upgrade:
+    status: planned
+
+  knowledge_base:
+    status: planned
+
+  user_permissions:
+    status: planned
+
+  billing_quota:
+    status: planned
+
+  notifications:
+    status: planned
+
+  marketplace:
+    status: planned
+
+  local_runtime:
+    status: planned

@@ -1,0 +1,21 @@
+
+roadmap:
+
+  v4:
+
+    name: Platform Installer and Admin Foundation
+
+    status: active
+
+  v5:
+
+    name: Agent Orchestrator and Advanced Tool Engine
+
+    status: planned
+
+  v6:
+
+    name: Marketplace, Multi-node Runtime, and Local AI Cluster
+
+    status: planned
+

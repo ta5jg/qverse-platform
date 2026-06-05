@@ -1,0 +1,40 @@
+repository:
+
+  root:
+    name: qverse-platform
+
+  backend:
+    enabled: true
+    description: Backend services and AI runtime
+
+  frontend:
+    enabled: true
+    description: Admin panel and user interfaces
+
+  installer:
+    enabled: true
+    description: Q-Verse Platform Installer
+
+  docs:
+    enabled: true
+    description: Human-readable documentation
+
+  machine:
+    enabled: true
+    description: Machine-readable registry files
+
+  scripts:
+    enabled: true
+    description: Helper scripts
+
+  deploy:
+    enabled: true
+    description: Deployment resources
+
+  tests:
+    enabled: true
+    description: Automated tests
+
+  github:
+    enabled: true
+    description: CI/CD workflows

@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: qverse-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: qverse
+      POSTGRES_PASSWORD: qverse
+      POSTGRES_DB: qverse
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qverse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: qverse-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  qverse-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: qverse-api
+    restart: unless-stopped
+    command: bash scripts/dev.sh
+    env_file:
+      - ../../.env
+    environment:
+      DATABASE_URL: postgresql://qverse:qverse@postgres:5432/qverse
+      REDIS_URL: redis://redis:6379/0
+      QVERSE_ENV: production
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../../:/app
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: qverse-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/agents.q-verse.io.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - qverse-api
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,23 @@
+
+monitoring:
+
+  checks:
+
+    - api_health
+
+    - docker_status
+
+    - postgres_status
+
+    - redis_status
+
+    - nginx_status
+
+    - n8n_status
+
+    - disk_usage
+
+    - memory_usage
+
+    - cpu_load
+

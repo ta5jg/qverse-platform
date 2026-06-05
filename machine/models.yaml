@@ -1,0 +1,13 @@
+providers:
+  - id: gemini
+    enabled: true
+  - id: openai
+    enabled: true
+  - id: anthropic
+    enabled: true
+  - id: deepseek
+    enabled: true
+  - id: openrouter
+    enabled: true
+  - id: ollama
+    enabled: true

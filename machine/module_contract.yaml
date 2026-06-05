@@ -1,0 +1,39 @@
+
+version: 1.0
+
+required_functions:
+
+  - detect
+
+  - install
+
+  - update
+
+  - repair
+
+  - backup
+
+  - restore
+
+  - validate
+
+  - status
+
+  - admin_api
+
+  - admin_ui
+
+required_states:
+
+  - planned
+
+  - scaffolded
+
+  - development
+
+  - testing
+
+  - stable
+
+  - deprecated
+

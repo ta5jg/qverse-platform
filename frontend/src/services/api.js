@@ -1,0 +1,1 @@
+export async function apiGet(url){const r=await fetch(url);return r.json();}

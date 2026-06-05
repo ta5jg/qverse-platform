@@ -1,0 +1,9 @@
+api:
+  base_path: /v1
+  endpoints:
+    - method: GET
+      path: /models
+      auth: true
+    - method: POST
+      path: /chat/completions
+      auth: true

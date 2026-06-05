@@ -1,0 +1,11 @@
+agents:
+  - id: qverse_core
+    name: Q-Verse Core Agent
+  - id: developer
+    name: Developer Agent
+  - id: devops
+    name: DevOps Agent
+  - id: security
+    name: Security Agent
+  - id: research
+    name: Research Agent

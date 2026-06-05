@@ -1,0 +1,29 @@
+
+deployment:
+
+  targets:
+
+    - local
+
+    - hetzner_vps
+
+    - docker
+
+    - github_actions
+
+steps:
+
+  - build_backend
+
+  - build_frontend
+
+  - run_tests
+
+  - backup_current
+
+  - deploy
+
+  - validate
+
+  - reload_services
+

@@ -1,0 +1,2 @@
+class AgentModule:
+    name = 'agent'

@@ -1,0 +1,222 @@
+from pathlib import Path
+
+BASE = Path(".")
+
+dirs = [
+    # Backend
+    "backend/api/routes",
+    "backend/api/middleware",
+    "backend/agents/core",
+    "backend/agents/dev",
+    "backend/agents/devops",
+    "backend/agents/security",
+    "backend/agents/research",
+    "backend/memory",
+    "backend/tools",
+    "backend/models",
+    "backend/auth",
+    "backend/integrations",
+    "backend/monitoring",
+    "backend/scheduler",
+    "backend/database",
+    "backend/config",
+
+    # Frontend
+    "frontend/src/api",
+    "frontend/src/components/Layout",
+    "frontend/src/components/Dashboard",
+    "frontend/src/components/Projects",
+    "frontend/src/components/Memory",
+    "frontend/src/components/Models",
+    "frontend/src/components/Agents",
+    "frontend/src/components/Integrations",
+    "frontend/src/components/Docker",
+    "frontend/src/components/System",
+    "frontend/src/components/Installer",
+    "frontend/src/components/Settings",
+    "frontend/src/pages",
+    "frontend/src/hooks",
+    "frontend/src/context",
+    "frontend/src/styles",
+
+    # Installer
+    "installer/core",
+    "installer/services",
+    "installer/models",
+    "installer/integrations",
+    "installer/frontend",
+    "installer/database",
+
+    # Ops
+    "docs",
+    "scripts",
+    "deploy/nginx",
+    "deploy/systemd",
+    "deploy/docker",
+    "tests/backend",
+    "tests/frontend",
+    ".github/workflows",
+]
+
+files = [
+    # Root
+    "ARCHITECTURE.md",
+    "README.md",
+    ".env.example",
+    ".gitignore",
+    "qverse_platform_installer_v4.py",
+
+    # Backend
+    "backend/package.json",
+    "backend/server.js",
+    "backend/config/env.js",
+    "backend/api/routes/admin.routes.js",
+    "backend/api/routes/chat.routes.js",
+    "backend/api/routes/models.routes.js",
+    "backend/api/routes/projects.routes.js",
+    "backend/api/routes/tools.routes.js",
+    "backend/api/routes/memory.routes.js",
+    "backend/api/routes/integrations.routes.js",
+    "backend/api/middleware/auth.js",
+    "backend/agents/core/QVerseAgent.js",
+    "backend/agents/dev/DeveloperAgent.js",
+    "backend/agents/devops/DevOpsAgent.js",
+    "backend/agents/security/SecurityAgent.js",
+    "backend/agents/research/ResearchAgent.js",
+    "backend/memory/postgresMemory.js",
+    "backend/tools/systemTool.js",
+    "backend/tools/fileTool.js",
+    "backend/tools/gitTool.js",
+    "backend/tools/dockerTool.js",
+    "backend/models/modelRouter.js",
+    "backend/models/geminiConnector.js",
+    "backend/models/openaiConnector.js",
+    "backend/models/ollamaConnector.js",
+    "backend/auth/apiKeyAuth.js",
+    "backend/integrations/telegram.js",
+    "backend/integrations/signal.js",
+    "backend/integrations/discord.js",
+    "backend/integrations/email.js",
+    "backend/monitoring/health.js",
+    "backend/scheduler/jobs.js",
+    "backend/database/schema.sql",
+
+    # Frontend
+    "frontend/package.json",
+    "frontend/index.html",
+    "frontend/vite.config.js",
+    "frontend/src/main.jsx",
+    "frontend/src/App.jsx",
+    "frontend/src/api/client.js",
+    "frontend/src/api/projects.js",
+    "frontend/src/api/memory.js",
+    "frontend/src/api/models.js",
+    "frontend/src/api/system.js",
+    "frontend/src/api/integrations.js",
+    "frontend/src/components/Layout/Sidebar.jsx",
+    "frontend/src/components/Layout/Topbar.jsx",
+    "frontend/src/components/Dashboard/Dashboard.jsx",
+    "frontend/src/components/Dashboard/StatCard.jsx",
+    "frontend/src/components/Projects/Projects.jsx",
+    "frontend/src/components/Memory/Memory.jsx",
+    "frontend/src/components/Models/Models.jsx",
+    "frontend/src/components/Agents/Agents.jsx",
+    "frontend/src/components/Integrations/Integrations.jsx",
+    "frontend/src/components/Docker/Docker.jsx",
+    "frontend/src/components/System/System.jsx",
+    "frontend/src/components/Installer/Installer.jsx",
+    "frontend/src/components/Settings/Settings.jsx",
+    "frontend/src/pages/DashboardPage.jsx",
+    "frontend/src/pages/ProjectsPage.jsx",
+    "frontend/src/pages/MemoryPage.jsx",
+    "frontend/src/pages/ModelsPage.jsx",
+    "frontend/src/pages/AgentsPage.jsx",
+    "frontend/src/pages/IntegrationsPage.jsx",
+    "frontend/src/pages/SystemPage.jsx",
+    "frontend/src/pages/InstallerPage.jsx",
+    "frontend/src/pages/SettingsPage.jsx",
+    "frontend/src/hooks/useProjects.js",
+    "frontend/src/hooks/useMemory.js",
+    "frontend/src/hooks/useModels.js",
+    "frontend/src/context/AuthContext.jsx",
+    "frontend/src/context/ThemeContext.jsx",
+    "frontend/src/styles/global.css",
+
+    # Installer files remain
+    "installer/core/__init__.py",
+    "installer/core/audit.py",
+    "installer/core/backup.py",
+    "installer/core/config.py",
+    "installer/core/logger.py",
+    "installer/core/state.py",
+    "installer/services/__init__.py",
+    "installer/services/nodejs.py",
+    "installer/services/docker.py",
+    "installer/services/postgres.py",
+    "installer/services/redis.py",
+    "installer/services/nginx.py",
+    "installer/services/certbot.py",
+    "installer/services/n8n.py",
+    "installer/services/qverse_api.py",
+    "installer/models/__init__.py",
+    "installer/models/gemini.py",
+    "installer/models/openai.py",
+    "installer/models/anthropic.py",
+    "installer/models/deepseek.py",
+    "installer/models/openrouter.py",
+    "installer/models/ollama.py",
+    "installer/models/lmstudio.py",
+    "installer/integrations/__init__.py",
+    "installer/integrations/telegram.py",
+    "installer/integrations/signal.py",
+    "installer/integrations/discord.py",
+    "installer/integrations/slack.py",
+    "installer/integrations/whatsapp.py",
+    "installer/integrations/email.py",
+    "installer/frontend/__init__.py",
+    "installer/frontend/react_admin.py",
+    "installer/frontend/components.py",
+    "installer/frontend/nginx_routes.py",
+    "installer/database/__init__.py",
+    "installer/database/schema.py",
+    "installer/database/seed.py",
+    "installer/database/migrations.py",
+
+    # Docs
+    "docs/BACKEND_ARCHITECTURE.md",
+    "docs/FRONTEND_ARCHITECTURE.md",
+    "docs/INSTALLER_ARCHITECTURE.md",
+    "docs/API_REGISTRY.md",
+    "docs/MODEL_ROUTER.md",
+    "docs/AGENT_ORCHESTRATOR.md",
+    "docs/TOOL_ENGINE.md",
+    "docs/SECURITY.md",
+
+    # Ops
+    "scripts/dev.sh",
+    "scripts/build.sh",
+    "scripts/deploy.sh",
+    "scripts/backup.sh",
+    "deploy/nginx/agents.q-verse.io.conf",
+    "deploy/systemd/qverse-ai-api.service",
+    "deploy/docker/docker-compose.yml",
+    "tests/backend/health.test.js",
+    "tests/frontend/app.test.jsx",
+    ".github/workflows/ci.yml",
+]
+
+for d in dirs:
+    path = BASE / d
+    path.mkdir(parents=True, exist_ok=True)
+    print(f"DIR  {path}")
+
+for f in files:
+    path = BASE / f
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.exists():
+        path.write_text("", encoding="utf-8")
+        print(f"FILE {path}")
+    else:
+        print(f"SKIP {path}")
+
+print("\nQ-Verse Platform structure ready.")

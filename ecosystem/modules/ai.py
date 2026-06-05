@@ -1,0 +1,2 @@
+class AIModule:
+    name = 'ai'

@@ -1,0 +1,1 @@
+export default function Installer(){return <div>Installer</div>;}\n

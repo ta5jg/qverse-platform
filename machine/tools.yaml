@@ -1,0 +1,8 @@
+tools:
+  - id: files
+  - id: git
+  - id: docker
+  - id: ssh
+  - id: terminal
+  - id: deploy
+  - id: logs

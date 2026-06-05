@@ -1,0 +1,16 @@
+[Unit]
+Description=Q-Verse AI API Service
+After=network.target
+Requires=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=%h/qverse-platform
+ExecStart=/usr/bin/env bash scripts/dev.sh
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=%h/qverse-platform/.env
+
+[Install]
+WantedBy=multi-user.target

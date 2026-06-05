@@ -1,0 +1,2 @@
+class InfrastructureModule:
+    name = 'infrastructure'

@@ -1,0 +1,29 @@
+
+notifications:
+
+  channels:
+
+    - telegram
+
+    - email
+
+    - discord
+
+    - slack
+
+events:
+
+  - install_completed
+
+  - install_failed
+
+  - backup_completed
+
+  - backup_failed
+
+  - deployment_completed
+
+  - deployment_failed
+
+  - security_alert
+

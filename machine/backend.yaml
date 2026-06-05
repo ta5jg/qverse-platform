@@ -1,0 +1,25 @@
+
+backend:
+
+  runtime: nodejs
+
+  framework: express
+
+  modules:
+
+    - api_gateway
+
+    - model_router
+
+    - agent_orchestrator
+
+    - tool_engine
+
+    - memory_engine
+
+    - integration_hub
+
+    - monitoring
+
+    - auth
+
