@@ -165,6 +165,44 @@ persistent_memory = PersistentMemory()
 vector_memory = VectorMemory()
 ''',
 
+    "memory/storage/SecretStore.py": '''import json
+from pathlib import Path
+
+
+class SecretStore:
+    def __init__(self, path="data/qverse_secrets.json"):
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        if not self.path.exists():
+            self.path.write_text("{}", encoding="utf-8")
+
+    def load(self):
+        return json.loads(self.path.read_text(encoding="utf-8") or "{}")
+
+    def save_secret(self, name, value):
+        data = self.load()
+        data[name] = value
+        self.path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        return {"name": name, "configured": bool(value), "masked": self.mask(value)}
+
+    def get_secret(self, name):
+        return self.load().get(name)
+
+    def list_secrets(self):
+        data = self.load()
+        return {name: {"configured": bool(value), "masked": self.mask(value)} for name, value in data.items()}
+
+    def mask(self, value):
+        if not value:
+            return ""
+        if len(value) <= 8:
+            return "****"
+        return value[:4] + "..." + value[-4:]
+
+
+secret_store = SecretStore()
+''',
+
     "ai/cost/ProviderCostRouter.py": '''
 class ProviderCostRouter:
     COST_ORDER = ["deepseek", "qwen", "gemini", "openai", "claude"]
@@ -225,6 +263,42 @@ class ProviderHealthMonitor:
 
 
 provider_health_monitor = ProviderHealthMonitor()
+''',
+
+    "ai/providers/ProviderAdmin.py": '''import os
+from memory.storage.SecretStore import secret_store
+
+
+class ProviderAdmin:
+    PROVIDER_KEYS = {
+        "openai": "OPENAI_API_KEY",
+        "claude": "ANTHROPIC_API_KEY",
+        "gemini": "GEMINI_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
+        "qwen": "QWEN_API_KEY",
+    }
+
+    def save_provider_key(self, provider, api_key):
+        env_key = self.PROVIDER_KEYS.get(provider)
+        if not env_key:
+            return {"success": False, "error": "unsupported_provider", "provider": provider}
+        saved = secret_store.save_secret(env_key, api_key)
+        return {"success": True, "provider": provider, "env_key": env_key, "secret": saved}
+
+    def list_providers(self):
+        secrets = secret_store.list_secrets()
+        providers = {}
+        for provider, env_key in self.PROVIDER_KEYS.items():
+            stored = secrets.get(env_key, {})
+            providers[provider] = {
+                "env_key": env_key,
+                "configured": bool(os.getenv(env_key)) or stored.get("configured", False),
+                "masked": stored.get("masked", ""),
+            }
+        return providers
+
+
+provider_admin = ProviderAdmin()
 ''',
 
     "security/PermissionLayer.py": '''
@@ -415,6 +489,7 @@ from agent.workflows.WorkflowEngine import workflow_engine
 from memory.storage.PersistentMemory import persistent_memory
 from memory.vector.VectorMemory import vector_memory
 from ai.monitoring.ProviderHealthCache import provider_health_cache
+from ai.providers.ProviderAdmin import provider_admin
 from integrations.twitter.TwitterRuntime import twitter_runtime
 from integrations.github.GitHubRuntime import github_runtime
 from integrations.telegram.TelegramRuntime import telegram_runtime
@@ -435,17 +510,30 @@ class ProjectRequest(BaseModel):
     name: str
     config: Dict[str, Any] = Field(default_factory=dict)
 
+class ProviderKeyRequest(BaseModel):
+    provider: str
+    api_key: str
+
 @router.get("/status")
 def status():
     return {
         "status": "ready",
         "providers": provider_health_cache.status(),
+        "provider_admin": provider_admin.list_providers(),
         "tasks": task_queue.list(),
         "events": event_bus.list_events(),
         "agents": agent_registry.list_agents(),
         "projects": project_registry.list_projects(),
         "plugins": plugin_registry.list_plugins(),
     }
+
+@router.get("/providers")
+def list_providers():
+    return provider_admin.list_providers()
+
+@router.post("/providers/key")
+def save_provider_key(req: ProviderKeyRequest):
+    return provider_admin.save_provider_key(req.provider, req.api_key)
 
 @router.post("/memory/save")
 def memory_save(req: KeyValueRequest):
@@ -500,22 +588,109 @@ def audit(event: str, payload: Dict[str, Any]):
     return audit_logger.log(event, payload)
 ''',
 
-    "frontend/admin/pages/ForgeAdmin.jsx": '''
+    "frontend/admin/pages/ForgeAdmin.jsx": '''import { useEffect, useState } from "react";
+
+const API_BASE = "https://api.q-verse.io";
+
 export default function ForgeAdmin() {
+  const [status, setStatus] = useState(null);
+  const [provider, setProvider] = useState("openai");
+  const [apiKey, setApiKey] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [agentName, setAgentName] = useState("");
+  const [message, setMessage] = useState("");
+
+  async function refresh() {
+    const res = await fetch(`${API_BASE}/forge/status`);
+    setStatus(await res.json());
+  }
+
+  async function saveProviderKey() {
+    const res = await fetch(`${API_BASE}/forge/providers/key`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ provider, api_key: apiKey })
+    });
+    const data = await res.json();
+    setMessage(JSON.stringify(data, null, 2));
+    setApiKey("");
+    refresh();
+  }
+
+  async function addProject() {
+    const res = await fetch(`${API_BASE}/forge/projects`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: projectName, config: { source: "admin" } })
+    });
+    setMessage(JSON.stringify(await res.json(), null, 2));
+    setProjectName("");
+    refresh();
+  }
+
+  async function addAgent() {
+    const res = await fetch(`${API_BASE}/forge/agents`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: agentName, config: { source: "admin" } })
+    });
+    setMessage(JSON.stringify(await res.json(), null, 2));
+    setAgentName("");
+    refresh();
+  }
+
+  useEffect(() => { refresh(); }, []);
+
   return (
-    <main style={{ padding: 24 }}>
+    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 1000 }}>
       <h1>Q-Verse Forge Admin</h1>
       <p>Manage providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
-      <ul>
-        <li>Provider Management</li>
-        <li>API Key Management</li>
-        <li>Project Registry</li>
-        <li>Agent Registry</li>
-        <li>Plugin System</li>
-        <li>Memory Explorer</li>
-        <li>Twitter Draft Queue</li>
-        <li>GitHub Webhooks</li>
-      </ul>
+
+      <section style={{ marginTop: 24 }}>
+        <h2>Provider API Keys</h2>
+        <select value={provider} onChange={(e) => setProvider(e.target.value)}>
+          <option value="openai">OpenAI</option>
+          <option value="claude">Claude</option>
+          <option value="gemini">Gemini</option>
+          <option value="deepseek">DeepSeek</option>
+          <option value="qwen">Qwen</option>
+        </select>
+        <input
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          placeholder="Enter API key"
+          type="text"
+          style={{ marginLeft: 8, width: 360 }}
+        />
+        <button onClick={saveProviderKey} style={{ marginLeft: 8 }}>Save Key</button>
+      </section>
+
+      <section style={{ marginTop: 24 }}>
+        <h2>Projects</h2>
+        <input value={projectName} onChange={(e) => setProjectName(e.target.value)} placeholder="Project name" />
+        <button onClick={addProject} style={{ marginLeft: 8 }}>Add Project</button>
+      </section>
+
+      <section style={{ marginTop: 24 }}>
+        <h2>Agents</h2>
+        <input value={agentName} onChange={(e) => setAgentName(e.target.value)} placeholder="Agent name" />
+        <button onClick={addAgent} style={{ marginLeft: 8 }}>Add Agent</button>
+      </section>
+
+      <section style={{ marginTop: 24 }}>
+        <h2>Live Forge Status</h2>
+        <button onClick={refresh}>Refresh</button>
+        <pre style={{ background: "#111", color: "#0f0", padding: 16, overflow: "auto" }}>
+          {JSON.stringify(status, null, 2)}
+        </pre>
+      </section>
+
+      {message && (
+        <section style={{ marginTop: 24 }}>
+          <h2>Last Action</h2>
+          <pre style={{ background: "#f5f5f5", padding: 16 }}>{message}</pre>
+        </section>
+      )}
     </main>
   );
 }
@@ -612,6 +787,8 @@ def run_compile_checks():
         "api/routes/forge.py",
         "api/routes/__init__.py",
         "ai/monitoring/ProviderHealthMonitor.py",
+        "ai/providers/ProviderAdmin.py",
+        "memory/storage/SecretStore.py",
         "scripts/bootstrap_qverse_ultimate_v12_runtime.py",
         "agent/events/EventBus.py",
         "agent/scheduler/TaskQueue.py",
@@ -638,7 +815,7 @@ def run_compile_checks():
     return results
 
 
-def write_report(written, skipped, scan, route_patch, compile_results):
+def write_report(written, skipped, scan_before, scan_after, route_patch, compile_results):
     report = {
         "version": VERSION,
         "status": "forge_complete",
@@ -649,11 +826,14 @@ def write_report(written, skipped, scan, route_patch, compile_results):
         "skipped_count": len(skipped),
         "written": written,
         "skipped": skipped,
-        "scan": scan,
+        "scan_before": scan_before,
+        "scan_after": scan_after,
         "route_patch": route_patch,
         "compile": compile_results,
         "endpoints": [
             "/forge/status",
+            "/forge/providers",
+            "/forge/providers/key",
             "/forge/memory/save",
             "/forge/vector/add",
             "/forge/vector/search",
@@ -693,13 +873,15 @@ def main():
             print(f"[SKIP] {path}")
             skipped.append(path)
 
+    scan_after = scan_project()
+
     route_patch = {"patched": False, "reason": "disabled"}
     if not args.no_patch_routes:
         route_patch = patch_routes_init()
         print(f"[ROUTES] {route_patch}")
 
     compile_results = run_compile_checks()
-    report_path = write_report(written, skipped, scan_before, route_patch, compile_results)
+    report_path = write_report(written, skipped, scan_before, scan_after, route_patch, compile_results)
 
     print(f"[SUMMARY] written={len(written)} skipped={len(skipped)}")
     print(f"[REPORT] {report_path.relative_to(ROOT)}")

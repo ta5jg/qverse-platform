@@ -11,6 +11,7 @@ from agent.workflows.WorkflowEngine import workflow_engine
 from memory.storage.PersistentMemory import persistent_memory
 from memory.vector.VectorMemory import vector_memory
 from ai.monitoring.ProviderHealthCache import provider_health_cache
+from ai.providers.ProviderAdmin import provider_admin
 from integrations.twitter.TwitterRuntime import twitter_runtime
 from integrations.github.GitHubRuntime import github_runtime
 from integrations.telegram.TelegramRuntime import telegram_runtime
@@ -31,17 +32,30 @@ class ProjectRequest(BaseModel):
     name: str
     config: Dict[str, Any] = Field(default_factory=dict)
 
+class ProviderKeyRequest(BaseModel):
+    provider: str
+    api_key: str
+
 @router.get("/status")
 def status():
     return {
         "status": "ready",
         "providers": provider_health_cache.status(),
+        "provider_admin": provider_admin.list_providers(),
         "tasks": task_queue.list(),
         "events": event_bus.list_events(),
         "agents": agent_registry.list_agents(),
         "projects": project_registry.list_projects(),
         "plugins": plugin_registry.list_plugins(),
     }
+
+@router.get("/providers")
+def list_providers():
+    return provider_admin.list_providers()
+
+@router.post("/providers/key")
+def save_provider_key(req: ProviderKeyRequest):
+    return provider_admin.save_provider_key(req.provider, req.api_key)
 
 @router.post("/memory/save")
 def memory_save(req: KeyValueRequest):

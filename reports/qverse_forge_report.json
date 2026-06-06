@@ -3,8 +3,8 @@
   "status": "forge_complete",
   "route_registry_target": "ROUTE_REGISTRY",
   "self_healing": true,
-  "timestamp": "2026-06-06T18:12:46.274360+00:00",
-  "written_count": 21,
+  "timestamp": "2026-06-06T19:21:39.174683+00:00",
+  "written_count": 23,
   "skipped_count": 0,
   "written": [
     "agent/events/EventBus.py",
@@ -15,9 +15,11 @@
     "agent/workflows/WorkflowEngine.py",
     "memory/storage/PersistentMemory.py",
     "memory/vector/VectorMemory.py",
+    "memory/storage/SecretStore.py",
     "ai/cost/ProviderCostRouter.py",
     "ai/monitoring/ProviderHealthCache.py",
     "ai/monitoring/ProviderHealthMonitor.py",
+    "ai/providers/ProviderAdmin.py",
     "security/PermissionLayer.py",
     "audit/AuditLogger.py",
     "integrations/twitter/TwitterRuntime.py",
@@ -30,8 +32,13 @@
     "docs/QVERSE_FORGE.md"
   ],
   "skipped": [],
-  "scan": {
-    "required": 21,
+  "scan_before": {
+    "required": 23,
+    "missing": [],
+    "missing_count": 0
+  },
+  "scan_after": {
+    "required": 23,
     "missing": [],
     "missing_count": 0
   },
@@ -42,6 +49,8 @@
     "api/routes/forge.py": "ok",
     "api/routes/__init__.py": "ok",
     "ai/monitoring/ProviderHealthMonitor.py": "ok",
+    "ai/providers/ProviderAdmin.py": "ok",
+    "memory/storage/SecretStore.py": "ok",
     "scripts/bootstrap_qverse_ultimate_v12_runtime.py": "ok",
     "agent/events/EventBus.py": "ok",
     "agent/scheduler/TaskQueue.py": "ok",
@@ -59,6 +68,8 @@
   },
   "endpoints": [
     "/forge/status",
+    "/forge/providers",
+    "/forge/providers/key",
     "/forge/memory/save",
     "/forge/vector/add",
     "/forge/vector/search",
