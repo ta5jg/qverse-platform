@@ -25,3 +25,5 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Plugin Manager UI
 - Memory Manager UI
 - Twitter Draft Manager UI
+- Forge Admin Vite App
+- Forge Admin Nginx Deploy Snippet

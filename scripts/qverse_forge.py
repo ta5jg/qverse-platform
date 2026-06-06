@@ -790,7 +790,109 @@ export default function ForgeAdmin() {
 }
 ''',
 
-# Add bootstrap runtime script before docs/QVERSE_FORGE.md
+    "frontend/admin/main.jsx": '''import React from "react";
+import { createRoot } from "react-dom/client";
+import ForgeAdmin from "./pages/ForgeAdmin.jsx";
+
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <ForgeAdmin />
+  </React.StrictMode>
+);
+''',
+
+    "frontend/admin/index.html": '''<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Q-Verse Forge Admin</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+''',
+
+    "frontend/admin/vite.config.js": '''import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  root: ".",
+  build: {
+    outDir: "dist",
+    emptyOutDir: true,
+  },
+});
+''',
+
+    "frontend/admin/package.json": json.dumps({
+        "name": "qverse-forge-admin",
+        "version": "12.1.0",
+        "private": True,
+        "type": "module",
+        "scripts": {
+            "dev": "vite --host 0.0.0.0 --port 5174",
+            "build": "vite build",
+            "preview": "vite preview --host 0.0.0.0 --port 4174"
+        },
+        "dependencies": {
+            "@vitejs/plugin-react": "latest",
+            "vite": "latest",
+            "react": "latest",
+            "react-dom": "latest"
+        },
+        "devDependencies": {}
+    }, indent=2) + "\n",
+
+    "frontend/admin/.env.example": '''VITE_QVERSE_API_BASE=https://api.q-verse.io
+''',
+
+    "frontend/admin/README.md": '''# Q-Verse Forge Admin UI
+
+This is the web admin interface for Q-Verse Forge.
+
+## Local development
+
+```bash
+cd frontend/admin
+npm install
+npm run dev
+```
+
+## Production build
+
+```bash
+cd frontend/admin
+npm install
+npm run build
+```
+
+Deploy the generated `dist` directory behind Nginx, for example under:
+
+```text
+https://api.q-verse.io/admin/forge/
+```
+
+The frontend talks to:
+
+```text
+https://api.q-verse.io/forge
+```
+''',
+
+    "deploy/nginx/forge-admin.conf": '''# Optional Nginx location for Q-Verse Forge Admin UI
+# Add this inside the api.q-verse.io server block after building frontend/admin/dist.
+
+location /admin/forge/ {
+    alias /opt/qverse-platform/frontend/admin/dist/;
+    index index.html;
+    try_files $uri $uri/ /admin/forge/index.html;
+}
+''',
+
     "scripts/bootstrap_qverse_ultimate_v12_runtime.py": '''#!/usr/bin/env python3
 from pathlib import Path
 
@@ -834,6 +936,8 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Plugin Manager UI
 - Memory Manager UI
 - Twitter Draft Manager UI
+- Forge Admin Vite App
+- Forge Admin Nginx Deploy Snippet
 '''
 }
 
@@ -934,6 +1038,7 @@ def write_report(written, skipped, scan_before, scan_after, route_patch, compile
             "/forge/status",
             "/forge/providers",
             "/forge/providers/key",
+            "/admin/forge/",
             "/forge/memory/save",
             "/forge/vector/add",
             "/forge/vector/search",
