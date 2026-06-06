@@ -810,7 +810,7 @@ createRoot(document.getElementById("root")).render(
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/main.jsx"></script>
   </body>
 </html>
 ''',
@@ -821,6 +821,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   root: ".",
+  base: "/admin/forge/",
   build: {
     outDir: "dist",
     emptyOutDir: true,
@@ -839,8 +840,8 @@ export default defineConfig({
             "preview": "vite preview --host 0.0.0.0 --port 4174"
         },
         "dependencies": {
-            "@vitejs/plugin-react": "latest",
-            "vite": "latest",
+            "@vitejs/plugin-react": "^4.3.4",
+            "vite": "^5.4.11",
             "react": "latest",
             "react-dom": "latest"
         },

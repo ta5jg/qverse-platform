@@ -3,7 +3,7 @@
   "status": "forge_complete",
   "route_registry_target": "ROUTE_REGISTRY",
   "self_healing": true,
-  "timestamp": "2026-06-06T20:18:19.199353+00:00",
+  "timestamp": "2026-06-06T21:58:59.428325+00:00",
   "written_count": 37,
   "skipped_count": 0,
   "written": [
@@ -48,16 +48,8 @@
   "skipped": [],
   "scan_before": {
     "required": 37,
-    "missing": [
-      "frontend/admin/main.jsx",
-      "frontend/admin/index.html",
-      "frontend/admin/vite.config.js",
-      "frontend/admin/package.json",
-      "frontend/admin/.env.example",
-      "frontend/admin/README.md",
-      "deploy/nginx/forge-admin.conf"
-    ],
-    "missing_count": 7
+    "missing": [],
+    "missing_count": 0
   },
   "scan_after": {
     "required": 37,
