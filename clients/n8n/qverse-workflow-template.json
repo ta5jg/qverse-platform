@@ -1,0 +1,46 @@
+{
+  "name": "Q-Verse Agent API Template",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.q-verse.io/agents/chat",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\"message\": \"Hello Q-Verse from n8n\", \"source\": \"n8n\", \"user_id\": \"n8n-user\", \"username\": \"n8n-user\", \"context\": {\"workflow\": \"Q-Verse Agent API Template\"}}"
+      },
+      "id": "qverse-http-request",
+      "name": "Q-Verse Agent Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Q-Verse Agent Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

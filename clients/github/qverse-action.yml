@@ -1,0 +1,44 @@
+name: Q-Verse Agent Chat
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: Message to send to Q-Verse Agent
+        required: true
+        default: Hello, Q-Verse!
+
+jobs:
+  qverse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message to Q-Verse
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          endpoint = "https://api.q-verse.io/agents/chat"
+          payload = {
+              "message": os.environ["QVERSE_MESSAGE"],
+              "source": "github-actions",
+              "user_id": os.environ.get("GITHUB_ACTOR", "github"),
+              "username": os.environ.get("GITHUB_ACTOR", "github"),
+              "context": {
+                  "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+                  "run_id": os.environ.get("GITHUB_RUN_ID", "")
+              }
+          }
+          request = urllib.request.Request(
+              endpoint,
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          with urllib.request.urlopen(request, timeout=60) as response:
+              print(response.read().decode("utf-8"))
+          PY
+        env:
+          QVERSE_MESSAGE: ${{ github.event.inputs.message }}

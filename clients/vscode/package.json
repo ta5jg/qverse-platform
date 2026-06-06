@@ -1,0 +1,36 @@
+{
+  "name": "qverse-vscode-client",
+  "displayName": "Q-Verse Agent Client",
+  "description": "Connect VS Code to Q-Verse Agent API",
+  "version": "10.1.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [
+    "onCommand:qverse.askAgent",
+    "onCommand:qverse.explainSelection"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "qverse.askAgent",
+        "title": "Q-Verse: Ask Agent"
+      },
+      {
+        "command": "qverse.explainSelection",
+        "title": "Q-Verse: Explain Selection"
+      }
+    ],
+    "configuration": {
+      "title": "Q-Verse",
+      "properties": {
+        "qverse.apiUrl": {
+          "type": "string",
+          "default": "https://api.q-verse.io/agents/chat",
+          "description": "Q-Verse Agent chat endpoint"
+        }
+      }
+    }
+  }
+}

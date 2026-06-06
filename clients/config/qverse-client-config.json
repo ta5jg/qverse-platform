@@ -1,0 +1,21 @@
+{
+  "version": "V10.1",
+  "api_base_url": "https://api.q-verse.io",
+  "chat_endpoint": "https://api.q-verse.io/agents/chat",
+  "standard_body_fields": [
+    "message",
+    "source",
+    "user_id",
+    "username",
+    "context"
+  ],
+  "clients": [
+    "cli",
+    "cursor",
+    "vscode",
+    "web",
+    "github",
+    "n8n",
+    "mcp"
+  ]
+}
