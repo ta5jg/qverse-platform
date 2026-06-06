@@ -1,16 +1,26 @@
-class ProviderHealthMonitor:
-    PROVIDERS = ["openai", "claude", "gemini", "deepseek", "qwen"]
+import os
 
-    def __init__(self):
-        # In a real system, configuration and health checks would be loaded here.
-        pass
+
+class ProviderHealthMonitor:
+    KEYS = {
+        "openai": "OPENAI_API_KEY",
+        "claude": "ANTHROPIC_API_KEY",
+        "gemini": "GEMINI_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
+        "qwen": "QWEN_API_KEY",
+    }
 
     def build_status(self):
-        status = {}
-        for name in self.PROVIDERS:
-            # Placeholder: In reality, count and health would be determined dynamically.
-            status[name] = {
-                "configured_count": 1,
-                "healthy": True
-            }
-        return status
+        providers = {
+            provider: {"configured": bool(os.getenv(env_key)), "env_key": env_key}
+            for provider, env_key in self.KEYS.items()
+        }
+        configured_count = sum(1 for item in providers.values() if item["configured"])
+        return {
+            "providers": providers,
+            "configured_count": configured_count,
+            "healthy": configured_count > 0,
+        }
+
+
+provider_health_monitor = ProviderHealthMonitor()

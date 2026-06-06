@@ -9,4 +9,4 @@ class AgentRegistry:
     def list_agents(self):
         return self.agents
 
-agent_registry = AgentRegistry()\n
+agent_registry = AgentRegistry()

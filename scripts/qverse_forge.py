@@ -149,18 +149,17 @@ class PersistentMemory:
 persistent_memory = PersistentMemory()
 ''',
 
-    "memory/vector/VectorMemory.py": '''
-class VectorMemory:
+    "memory/vector/VectorMemory.py": '''class VectorMemory:
     def __init__(self):
-        self.items = []
+        self.records = list()
 
     def add(self, text, metadata=None):
-        item = {"id": len(self.items) + 1, "text": text, "metadata": metadata or {}}
-        self.items.append(item)
+        item = {"id": len(self.records) + 1, "text": text, "metadata": metadata or {}}
+        self.records.append(item)
         return item
 
     def search(self, query, limit=5):
-        hits = [item for item in self.items if query.lower() in item["text"].lower()]
+        hits = [item for item in self.records if query.lower() in item["text"].lower()]
         return hits[:limit]
 
 vector_memory = VectorMemory()
@@ -198,6 +197,34 @@ class ProviderHealthCache:
         }
 
 provider_health_cache = ProviderHealthCache()
+''',
+
+    "ai/monitoring/ProviderHealthMonitor.py": '''import os
+
+
+class ProviderHealthMonitor:
+    KEYS = {
+        "openai": "OPENAI_API_KEY",
+        "claude": "ANTHROPIC_API_KEY",
+        "gemini": "GEMINI_API_KEY",
+        "deepseek": "DEEPSEEK_API_KEY",
+        "qwen": "QWEN_API_KEY",
+    }
+
+    def build_status(self):
+        providers = {
+            provider: {"configured": bool(os.getenv(env_key)), "env_key": env_key}
+            for provider, env_key in self.KEYS.items()
+        }
+        configured_count = sum(1 for item in providers.values() if item["configured"])
+        return {
+            "providers": providers,
+            "configured_count": configured_count,
+            "healthy": configured_count > 0,
+        }
+
+
+provider_health_monitor = ProviderHealthMonitor()
 ''',
 
     "security/PermissionLayer.py": '''
@@ -270,6 +297,108 @@ class TelegramRuntime:
         return {"integration": "telegram", "message": message, "status": "received"}
 
 telegram_runtime = TelegramRuntime()
+''',
+
+    "api/routes/__init__.py": '''"""
+Q-Verse API Routes Registry V12 Forge Hardened
+"""
+
+from dataclasses import dataclass
+from typing import List
+
+from fastapi import APIRouter
+
+from api.routes.admin import router as admin_router
+from api.routes.agents import router as agents_router
+from api.routes.audit import router as audit_router
+from api.routes.backup import router as backup_router
+from api.routes.config import router as config_router
+from api.routes.database import router as database_router
+from api.routes.deployments import router as deployments_router
+from api.routes.engines import router as engines_router
+from api.routes.forge import router as forge_router
+from api.routes.health import router as health_router
+from api.routes.integrations import router as integrations_router
+from api.routes.logs import router as logs_router
+from api.routes.marketplace import router as marketplace_router
+from api.routes.models import router as models_router
+from api.routes.notifications import router as notifications_router
+from api.routes.orchestrator import router as orchestrator_router
+from api.routes.projects import router as projects_router
+from api.routes.runtime import router as runtime_router
+from api.routes.security import router as security_router
+from api.routes.services import router as services_router
+from api.routes.state import router as state_router
+from api.routes.system import router as system_router
+from api.routes.tasks import router as tasks_router
+from api.routes.telemetry import router as telemetry_router
+from api.routes.workflows import router as workflows_router
+from api.routes.agent_chat import router as agent_chat_router
+
+ROUTES_VERSION = "V12"
+ROUTES_STATUS = "V12_FORGE_READY"
+
+
+@dataclass(frozen=True)
+class RouteDefinition:
+    name: str
+    prefix: str
+    router: APIRouter
+    version: str = ROUTES_VERSION
+    enabled: bool = True
+
+
+ROUTE_REGISTRY: List[RouteDefinition] = [
+    RouteDefinition("forge", "/forge", forge_router),
+    RouteDefinition("health", "/health", health_router),
+    RouteDefinition("system", "/system", system_router),
+    RouteDefinition("runtime", "/runtime", runtime_router),
+    RouteDefinition("services", "/services", services_router),
+    RouteDefinition("engines", "/engines", engines_router),
+    RouteDefinition("admin", "/admin", admin_router),
+    RouteDefinition("telemetry", "/telemetry", telemetry_router),
+    RouteDefinition("config", "/config", config_router),
+    RouteDefinition("audit", "/audit", audit_router),
+    RouteDefinition("backup", "/backup", backup_router),
+    RouteDefinition("logs", "/logs", logs_router),
+    RouteDefinition("state", "/state", state_router),
+    RouteDefinition("projects", "/projects", projects_router),
+    RouteDefinition("models", "/models", models_router),
+    RouteDefinition("integrations", "/integrations", integrations_router),
+    RouteDefinition("database", "/database", database_router),
+    RouteDefinition("security", "/security", security_router),
+    RouteDefinition("tasks", "/tasks", tasks_router),
+    RouteDefinition("notifications", "/notifications", notifications_router),
+    RouteDefinition("agents", "/agents", agents_router),
+    RouteDefinition("agent_chat", "/agents", agent_chat_router),
+    RouteDefinition("orchestrator", "/orchestrator", orchestrator_router),
+    RouteDefinition("deployments", "/deployments", deployments_router),
+    RouteDefinition("workflows", "/workflows", workflows_router),
+    RouteDefinition("marketplace", "/marketplace", marketplace_router),
+]
+
+
+def enabled_routers() -> List[APIRouter]:
+    return [route.router for route in ROUTE_REGISTRY if route.enabled]
+
+
+def route_manifest() -> dict:
+    enabled_routes = [route for route in ROUTE_REGISTRY if route.enabled]
+    return {
+        "version": ROUTES_VERSION,
+        "status": ROUTES_STATUS,
+        "total": len(ROUTE_REGISTRY),
+        "enabled": len(enabled_routes),
+        "routes": [
+            {
+                "name": route.name,
+                "prefix": route.prefix,
+                "version": route.version,
+                "enabled": route.enabled,
+            }
+            for route in ROUTE_REGISTRY
+        ],
+    }
 ''',
 
     "api/routes/forge.py": '''
@@ -392,6 +521,22 @@ export default function ForgeAdmin() {
 }
 ''',
 
+# Add bootstrap runtime script before docs/QVERSE_FORGE.md
+    "scripts/bootstrap_qverse_ultimate_v12_runtime.py": '''#!/usr/bin/env python3
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def main():
+    print("Q-Verse V12 runtime bootstrap is delegated to scripts/qverse_forge.py")
+    print(f"Project root: {ROOT}")
+
+
+if __name__ == "__main__":
+    main()
+''',
+
     "docs/QVERSE_FORGE.md": '''
 # Q-Verse Forge
 
@@ -465,6 +610,9 @@ def scan_project():
 def run_compile_checks():
     checks = [
         "api/routes/forge.py",
+        "api/routes/__init__.py",
+        "ai/monitoring/ProviderHealthMonitor.py",
+        "scripts/bootstrap_qverse_ultimate_v12_runtime.py",
         "agent/events/EventBus.py",
         "agent/scheduler/TaskQueue.py",
         "agent/registry/AgentRegistry.py",

@@ -15,4 +15,4 @@ class ProviderHealthCache:
             for provider, env_key in self.KEYS.items()
         }
 
-provider_health_cache = ProviderHealthCache()\n
+provider_health_cache = ProviderHealthCache()

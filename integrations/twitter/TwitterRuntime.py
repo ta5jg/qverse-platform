@@ -11,4 +11,4 @@ class TwitterRuntime:
     def list_drafts(self):
         return self.drafts
 
-twitter_runtime = TwitterRuntime()\n
+twitter_runtime = TwitterRuntime()

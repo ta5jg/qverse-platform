@@ -10,4 +10,4 @@ class PermissionLayer:
         allowed = self.roles.get(role, [])
         return "*" in allowed or permission in allowed
 
-permission_layer = PermissionLayer()\n
+permission_layer = PermissionLayer()

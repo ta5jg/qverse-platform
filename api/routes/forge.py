@@ -93,4 +93,4 @@ def permission_check(role: str, permission: str):
 
 @router.post("/audit/{event}")
 def audit(event: str, payload: Dict[str, Any]):
-    return audit_logger.log(event, payload)\n
+    return audit_logger.log(event, payload)

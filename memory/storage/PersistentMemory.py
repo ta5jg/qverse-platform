@@ -20,4 +20,4 @@ class PersistentMemory:
     def get(self, namespace, key):
         return self.load().get(namespace, {}).get(key)
 
-persistent_memory = PersistentMemory()\n
+persistent_memory = PersistentMemory()

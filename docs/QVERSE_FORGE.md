@@ -18,4 +18,4 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - GitHub Runtime
 - Telegram Runtime
 - Twitter Safe Draft Runtime
-- Admin Dashboard\n
+- Admin Dashboard

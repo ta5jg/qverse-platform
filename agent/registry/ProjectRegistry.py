@@ -9,4 +9,4 @@ class ProjectRegistry:
     def list_projects(self):
         return self.projects
 
-project_registry = ProjectRegistry()\n
+project_registry = ProjectRegistry()

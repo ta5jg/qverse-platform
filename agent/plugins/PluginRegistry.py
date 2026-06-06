@@ -9,4 +9,4 @@ class PluginRegistry:
     def list_plugins(self):
         return self.plugins
 
-plugin_registry = PluginRegistry()\n
+plugin_registry = PluginRegistry()

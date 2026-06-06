@@ -12,4 +12,4 @@ class WorkflowEngine:
             return {"success": False, "error": "workflow_not_found"}
         return {"success": True, "workflow": name, "payload": payload or {}, "steps": workflow["steps"]}
 
-workflow_engine = WorkflowEngine()\n
+workflow_engine = WorkflowEngine()

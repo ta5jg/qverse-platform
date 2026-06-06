@@ -17,4 +17,4 @@ class TaskQueue:
     def list(self):
         return self.tasks
 
-task_queue = TaskQueue()\n
+task_queue = TaskQueue()

@@ -17,4 +17,4 @@ class AuditLogger:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
         return record
 
-audit_logger = AuditLogger()\n
+audit_logger = AuditLogger()

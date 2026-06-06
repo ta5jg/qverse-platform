@@ -7,4 +7,4 @@ class ProviderCostRouter:
                 return provider
         return available[0] if available else None
 
-provider_cost_router = ProviderCostRouter()\n
+provider_cost_router = ProviderCostRouter()

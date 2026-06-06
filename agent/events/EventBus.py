@@ -10,4 +10,4 @@ class EventBus:
     def list_events(self):
         return self.events
 
-event_bus = EventBus()\n
+event_bus = EventBus()
