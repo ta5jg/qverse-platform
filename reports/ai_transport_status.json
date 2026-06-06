@@ -1,0 +1,17 @@
+{
+  "openai": {
+    "configured": false
+  },
+  "claude": {
+    "configured": false
+  },
+  "gemini": {
+    "configured": false
+  },
+  "deepseek": {
+    "configured": false
+  },
+  "qwen": {
+    "configured": false
+  }
+}

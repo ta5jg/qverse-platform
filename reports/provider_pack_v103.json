@@ -1,0 +1,12 @@
+{
+  "version": "V10.3",
+  "providers": [
+    "openai",
+    "claude",
+    "gemini",
+    "deepseek",
+    "qwen"
+  ],
+  "health_monitor": true,
+  "multi_provider": true
+}

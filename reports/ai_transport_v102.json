@@ -1,0 +1,18 @@
+{
+  "version": "V10.2",
+  "live_transport": true,
+  "providers": [
+    "openai",
+    "claude",
+    "gemini",
+    "deepseek",
+    "qwen",
+    "mistral",
+    "grok",
+    "openrouter",
+    "ollama",
+    "lmstudio"
+  ],
+  "routing": "multi-provider",
+  "target_version": "V10.3"
+}

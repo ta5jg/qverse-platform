@@ -1,21 +1,15 @@
 class WorkflowEngine:
     def __init__(self):
-        self.workflows = []
+        self.workflows = {}
 
-    def register_workflow(self, name: str, steps=None):
-        workflow = {
-            "name": name,
-            "steps": steps or [],
-            "status": "registered",
-        }
-        self.workflows.append(workflow)
-        return workflow
+    def create(self, name, steps=None):
+        self.workflows[name] = {"steps": steps or [], "status": "ready"}
+        return self.workflows[name]
 
-    def list_workflows(self):
-        return list(self.workflows)
+    def run(self, name, payload=None):
+        workflow = self.workflows.get(name)
+        if not workflow:
+            return {"success": False, "error": "workflow_not_found"}
+        return {"success": True, "workflow": name, "payload": payload or {}, "steps": workflow["steps"]}
 
-    def run_workflow(self, name: str):
-        return {
-            "workflow": name,
-            "status": "running",
-        }
+workflow_engine = WorkflowEngine()\n

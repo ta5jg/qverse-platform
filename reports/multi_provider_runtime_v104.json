@@ -1,0 +1,12 @@
+{
+  "version": "V10.4",
+  "runtime": "multi-provider",
+  "failover": true,
+  "providers": [
+    "openai",
+    "claude",
+    "gemini",
+    "deepseek",
+    "qwen"
+  ]
+}
