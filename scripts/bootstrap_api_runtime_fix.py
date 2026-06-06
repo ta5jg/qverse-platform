@@ -1,5 +1,3 @@
-
-
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
@@ -150,6 +148,51 @@ def run_agent(request: AgentChatRequest):
     return agent_manager.run(request.model_dump())
 ''',
 
+    "api/routes/agents.py": '''from fastapi import APIRouter
+from pydantic import BaseModel, Field
+from typing import Any, Dict, Optional
+
+from api.managers.agent_manager import agent_manager
+
+router = APIRouter(prefix="/agents", tags=["agents"])
+
+
+class AgentChatRequest(BaseModel):
+    message: str = Field(default="")
+    source: str = Field(default="api")
+    user_id: str = Field(default="anonymous")
+    username: Optional[str] = None
+    context: Dict[str, Any] = Field(default_factory=dict)
+
+
+@router.get("")
+def get_agents_dashboard():
+    return agent_manager.get_dashboard()
+
+
+@router.get("/")
+def get_agents_dashboard_slash():
+    return agent_manager.get_dashboard()
+
+
+@router.post("/chat")
+def chat_with_agent(request: AgentChatRequest):
+    context = dict(request.context or {})
+    if request.username:
+        context["username"] = request.username
+    return agent_manager.chat(
+        message=request.message,
+        source=request.source,
+        user_id=request.user_id,
+        context=context,
+    )
+
+
+@router.post("/run")
+def run_agent(request: AgentChatRequest):
+    return agent_manager.run(request.model_dump())
+''',
+
     "api/routes/orchestrator.py": '''from fastapi import APIRouter
 from api.managers.system_manager import system_manager
 
@@ -200,7 +243,8 @@ def patch_routes_init():
         content = "\n".join(lines) + "\n"
         print("[PATCH] import agent_chat_router")
 
-    if "enabled_routers" in content and ROUTES_INIT_INCLUDE not in content:
+    enabled_block_has_agent_chat = "agent_chat_router," in content or "agent_chat_router" in content.split("enabled_routers = [", 1)[-1].split("]", 1)[0]
+    if "enabled_routers" in content and not enabled_block_has_agent_chat:
         content = content.replace("enabled_routers = [", "enabled_routers = [\n    agent_chat_router,")
         print("[PATCH] include agent_chat_router")
 
@@ -217,7 +261,7 @@ def main():
         write_file(path, content, force=args.force)
     patch_routes_init()
     print(f"[SUMMARY] Runtime fixes generated: {len(FILES)}")
-    print("[API] Agent dashboard, orchestrator metrics and n8n chat endpoints ready")
+    print("[API] Agent dashboard, orchestrator metrics, existing agents route and n8n chat endpoints ready")
     print("Q-Verse API Runtime Fix Complete")
 
 
