@@ -1,38 +1,92 @@
-from ai.router.ProviderSelector import ProviderSelector
-from ai.providers.OpenAIProvider import OpenAIProvider
-from ai.providers.ClaudeProvider import ClaudeProvider
-from ai.providers.GeminiProvider import GeminiProvider
-from ai.providers.DeepSeekProvider import DeepSeekProvider
-from ai.providers.QwenProvider import QwenProvider
+import os
+import requests
+
+from memory.storage.SecretStore import secret_store
+
 
 class AIResponseEngine:
     def __init__(self):
-        self.selector = ProviderSelector()
-        self.providers = {
-            "openai": OpenAIProvider(),
-            "claude": ClaudeProvider(),
-            "gemini": GeminiProvider(),
-            "deepseek": DeepSeekProvider(),
-            "qwen": QwenProvider()
-        }
+        self.provider = "openai"
+        self.model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
+    def _get_openai_key(self):
+        return os.getenv("OPENAI_API_KEY") or secret_store.get_secret("OPENAI_API_KEY")
+
+    def respond(self, prompt, context=None):
+        api_key = self._get_openai_key()
+        if not api_key:
+            return {
+                "engine": "ai_response_engine",
+                "version": "V12",
+                "result": {
+                    "provider": "openai",
+                    "status": "missing_api_key",
+                    "transport_enabled": False,
+                    "prompt": prompt,
+                    "context": context or {},
+                    "response": None,
+                    "fallback_used": True,
+                },
+            }
+
+        try:
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self.model,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are Q-Verse Agent, a concise and helpful AI runtime assistant.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    "temperature": 0.4,
+                },
+                timeout=45,
+            )
+            response.raise_for_status()
+            data = response.json()
+            text = data["choices"][0]["message"]["content"]
+            return {
+                "engine": "ai_response_engine",
+                "version": "V12",
+                "result": {
+                    "provider": "openai",
+                    "status": "completed",
+                    "transport_enabled": True,
+                    "prompt": prompt,
+                    "context": context or {},
+                    "response": text,
+                    "fallback_used": False,
+                },
+            }
+        except Exception as exc:
+            return {
+                "engine": "ai_response_engine",
+                "version": "V12",
+                "result": {
+                    "provider": "openai",
+                    "status": "error",
+                    "transport_enabled": True,
+                    "prompt": prompt,
+                    "context": context or {},
+                    "error": exc.__class__.__name__,
+                    "message": str(exc),
+                    "response": None,
+                    "fallback_used": True,
+                },
+            }
 
     def chat(self, prompt, context=None):
-        for name in self.selector.select_order():
-            provider = self.providers.get(name)
-            if not provider or not getattr(provider, "transport_enabled", True):
-                continue
-            try:
-                result = provider.chat(prompt, context)
-                if result:
-                    return {
-                        "engine": "ai_response_engine",
-                        "version": "V10.4",
-                        "result": result
-                    }
-            except Exception:
-                continue
-        return {
-            "engine": "ai_response_engine",
-            "version": "V10.4",
-            "result": None
-        }
+        return self.respond(prompt, context)
+
+    def generate(self, prompt, context=None):
+        return self.respond(prompt, context)
+
+
+ai_response_engine = AIResponseEngine()
