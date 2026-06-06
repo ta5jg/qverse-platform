@@ -12,14 +12,14 @@ class AIResponseEngine:
     def _get_openai_key(self):
         return os.getenv("OPENAI_API_KEY") or secret_store.get_secret("OPENAI_API_KEY")
 
-    def respond(self, prompt, context=None):
+    def respond(self, prompt, context=None, provider=None, model=None, **kwargs):
         api_key = self._get_openai_key()
         if not api_key:
             return {
                 "engine": "ai_response_engine",
                 "version": "V12",
                 "result": {
-                    "provider": "openai",
+                    "provider": provider or "openai",
                     "status": "missing_api_key",
                     "transport_enabled": False,
                     "prompt": prompt,
@@ -37,7 +37,7 @@ class AIResponseEngine:
                     "Content-Type": "application/json",
                 },
                 json={
-                    "model": self.model,
+                    "model": model or self.model,
                     "messages": [
                         {
                             "role": "system",
@@ -56,7 +56,7 @@ class AIResponseEngine:
                 "engine": "ai_response_engine",
                 "version": "V12",
                 "result": {
-                    "provider": "openai",
+                    "provider": provider or "openai",
                     "status": "completed",
                     "transport_enabled": True,
                     "prompt": prompt,
@@ -70,7 +70,7 @@ class AIResponseEngine:
                 "engine": "ai_response_engine",
                 "version": "V12",
                 "result": {
-                    "provider": "openai",
+                    "provider": provider or "openai",
                     "status": "error",
                     "transport_enabled": True,
                     "prompt": prompt,
@@ -82,11 +82,11 @@ class AIResponseEngine:
                 },
             }
 
-    def chat(self, prompt, context=None):
-        return self.respond(prompt, context)
+    def chat(self, prompt, context=None, provider=None, model=None, **kwargs):
+        return self.respond(prompt, context=context, provider=provider, model=model, **kwargs)
 
-    def generate(self, prompt, context=None):
-        return self.respond(prompt, context)
+    def generate(self, prompt, context=None, provider=None, model=None, **kwargs):
+        return self.respond(prompt, context=context, provider=provider, model=model, **kwargs)
 
 
 ai_response_engine = AIResponseEngine()
