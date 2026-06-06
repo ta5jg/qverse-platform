@@ -3,8 +3,8 @@
   "status": "forge_complete",
   "route_registry_target": "ROUTE_REGISTRY",
   "self_healing": true,
-  "timestamp": "2026-06-06T19:21:39.174683+00:00",
-  "written_count": 23,
+  "timestamp": "2026-06-06T20:02:31.790117+00:00",
+  "written_count": 30,
   "skipped_count": 0,
   "written": [
     "agent/events/EventBus.py",
@@ -27,18 +27,33 @@
     "integrations/telegram/TelegramRuntime.py",
     "api/routes/__init__.py",
     "api/routes/forge.py",
+    "frontend/admin/components/SystemStatus.jsx",
+    "frontend/admin/components/ProviderManager.jsx",
+    "frontend/admin/components/ProjectManager.jsx",
+    "frontend/admin/components/AgentManager.jsx",
+    "frontend/admin/components/PluginManager.jsx",
+    "frontend/admin/components/MemoryManager.jsx",
+    "frontend/admin/components/TwitterDraftManager.jsx",
     "frontend/admin/pages/ForgeAdmin.jsx",
     "scripts/bootstrap_qverse_ultimate_v12_runtime.py",
     "docs/QVERSE_FORGE.md"
   ],
   "skipped": [],
   "scan_before": {
-    "required": 23,
-    "missing": [],
-    "missing_count": 0
+    "required": 30,
+    "missing": [
+      "frontend/admin/components/SystemStatus.jsx",
+      "frontend/admin/components/ProviderManager.jsx",
+      "frontend/admin/components/ProjectManager.jsx",
+      "frontend/admin/components/AgentManager.jsx",
+      "frontend/admin/components/PluginManager.jsx",
+      "frontend/admin/components/MemoryManager.jsx",
+      "frontend/admin/components/TwitterDraftManager.jsx"
+    ],
+    "missing_count": 7
   },
   "scan_after": {
-    "required": 23,
+    "required": 30,
     "missing": [],
     "missing_count": 0
   },

@@ -19,3 +19,9 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Telegram Runtime
 - Twitter Safe Draft Runtime
 - Admin Dashboard
+- Provider Manager UI
+- Project Manager UI
+- Agent Manager UI
+- Plugin Manager UI
+- Memory Manager UI
+- Twitter Draft Manager UI

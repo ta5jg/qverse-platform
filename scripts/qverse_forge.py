@@ -588,7 +588,119 @@ def audit(event: str, payload: Dict[str, Any]):
     return audit_logger.log(event, payload)
 ''',
 
+
+    "frontend/admin/components/SystemStatus.jsx": '''export default function SystemStatus({ status, onRefresh }) {
+  return (
+    <section style={{ marginTop: 24 }}>
+      <h2>System Status</h2>
+      <button onClick={onRefresh}>Refresh</button>
+      <pre style={{ background: "#111", color: "#0f0", padding: 16, overflow: "auto" }}>
+        {JSON.stringify(status, null, 2)}
+      </pre>
+    </section>
+  );
+}
+''',
+
+    "frontend/admin/components/ProviderManager.jsx": '''export default function ProviderManager({ provider, setProvider, apiKey, setApiKey, onSave }) {
+  return (
+    <section style={{ marginTop: 24 }}>
+      <h2>Provider API Keys</h2>
+      <select value={provider} onChange={(e) => setProvider(e.target.value)}>
+        <option value="openai">OpenAI</option>
+        <option value="claude">Claude</option>
+        <option value="gemini">Gemini</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="qwen">Qwen</option>
+      </select>
+      <input
+        value={apiKey}
+        onChange={(e) => setApiKey(e.target.value)}
+        placeholder="Enter API key"
+        type="text"
+        style={{ marginLeft: 8, width: 360 }}
+      />
+      <button onClick={onSave} style={{ marginLeft: 8 }}>Save Key</button>
+    </section>
+  );
+}
+''',
+
+    "frontend/admin/components/ProjectManager.jsx": '''export default function ProjectManager({ projectName, setProjectName, onAdd }) {
+  return (
+    <section style={{ marginTop: 24 }}>
+      <h2>Projects</h2>
+      <input value={projectName} onChange={(e) => setProjectName(e.target.value)} placeholder="Project name" />
+      <button onClick={onAdd} style={{ marginLeft: 8 }}>Add Project</button>
+    </section>
+  );
+}
+''',
+
+    "frontend/admin/components/AgentManager.jsx": '''export default function AgentManager({ agentName, setAgentName, onAdd }) {
+  return (
+    <section style={{ marginTop: 24 }}>
+      <h2>Agents</h2>
+      <input value={agentName} onChange={(e) => setAgentName(e.target.value)} placeholder="Agent name" />
+      <button onClick={onAdd} style={{ marginLeft: 8 }}>Add Agent</button>
+    </section>
+  );
+}
+''',
+
+    "frontend/admin/components/PluginManager.jsx": '''export default function PluginManager({ pluginName, setPluginName, onAdd }) {
+  return (
+    <section style={{ marginTop: 24 }}>
+      <h2>Plugins</h2>
+      <input value={pluginName} onChange={(e) => setPluginName(e.target.value)} placeholder="Plugin name" />
+      <button onClick={onAdd} style={{ marginLeft: 8 }}>Add Plugin</button>
+    </section>
+  );
+}
+''',
+
+    "frontend/admin/components/MemoryManager.jsx": '''export default function MemoryManager({ memoryKey, setMemoryKey, memoryValue, setMemoryValue, onSave }) {
+  return (
+    <section style={{ marginTop: 24 }}>
+      <h2>Memory</h2>
+      <input value={memoryKey} onChange={(e) => setMemoryKey(e.target.value)} placeholder="Memory key" />
+      <input
+        value={memoryValue}
+        onChange={(e) => setMemoryValue(e.target.value)}
+        placeholder="Memory value"
+        style={{ marginLeft: 8, width: 360 }}
+      />
+      <button onClick={onSave} style={{ marginLeft: 8 }}>Save Memory</button>
+    </section>
+  );
+}
+''',
+
+    "frontend/admin/components/TwitterDraftManager.jsx": '''export default function TwitterDraftManager({ draftText, setDraftText, onDraft }) {
+  return (
+    <section style={{ marginTop: 24 }}>
+      <h2>Twitter/X Draft Queue</h2>
+      <textarea
+        value={draftText}
+        onChange={(e) => setDraftText(e.target.value)}
+        placeholder="Draft safe-mode post"
+        rows={4}
+        style={{ width: "100%" }}
+      />
+      <button onClick={onDraft} style={{ marginTop: 8 }}>Create Draft</button>
+    </section>
+  );
+}
+''',
+
     "frontend/admin/pages/ForgeAdmin.jsx": '''import { useEffect, useState } from "react";
+import AgentManager from "../components/AgentManager.jsx";
+import MemoryManager from "../components/MemoryManager.jsx";
+import PluginManager from "../components/PluginManager.jsx";
+import ProjectManager from "../components/ProjectManager.jsx";
+import ProviderManager from "../components/ProviderManager.jsx";
+import SystemStatus from "../components/SystemStatus.jsx";
+import TwitterDraftManager from "../components/TwitterDraftManager.jsx";
 
 const API_BASE = "https://api.q-verse.io";
 
@@ -598,6 +710,10 @@ export default function ForgeAdmin() {
   const [apiKey, setApiKey] = useState("");
   const [projectName, setProjectName] = useState("");
   const [agentName, setAgentName] = useState("");
+  const [pluginName, setPluginName] = useState("");
+  const [memoryKey, setMemoryKey] = useState("");
+  const [memoryValue, setMemoryValue] = useState("");
+  const [draftText, setDraftText] = useState("");
   const [message, setMessage] = useState("");
 
   async function refresh() {
@@ -605,85 +721,63 @@ export default function ForgeAdmin() {
     setStatus(await res.json());
   }
 
-  async function saveProviderKey() {
-    const res = await fetch(`${API_BASE}/forge/providers/key`, {
+  async function postJson(path, body) {
+    const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ provider, api_key: apiKey })
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     setMessage(JSON.stringify(data, null, 2));
+    await refresh();
+    return data;
+  }
+
+  async function saveProviderKey() {
+    await postJson("/forge/providers/key", { provider, api_key: apiKey });
     setApiKey("");
-    refresh();
   }
 
   async function addProject() {
-    const res = await fetch(`${API_BASE}/forge/projects`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: projectName, config: { source: "admin" } })
-    });
-    setMessage(JSON.stringify(await res.json(), null, 2));
+    await postJson("/forge/projects", { name: projectName, config: { source: "admin" } });
     setProjectName("");
-    refresh();
   }
 
   async function addAgent() {
-    const res = await fetch(`${API_BASE}/forge/agents`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: agentName, config: { source: "admin" } })
-    });
-    setMessage(JSON.stringify(await res.json(), null, 2));
+    await postJson("/forge/agents", { name: agentName, config: { source: "admin" } });
     setAgentName("");
-    refresh();
+  }
+
+  async function addPlugin() {
+    await postJson("/forge/plugins", { name: pluginName, config: { source: "admin" } });
+    setPluginName("");
+  }
+
+  async function saveMemory() {
+    await postJson("/forge/memory/save", { namespace: "admin", key: memoryKey, value: memoryValue });
+    setMemoryKey("");
+    setMemoryValue("");
+  }
+
+  async function createTwitterDraft() {
+    await postJson("/forge/twitter/draft", { text: draftText });
+    setDraftText("");
   }
 
   useEffect(() => { refresh(); }, []);
 
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 1000 }}>
-      <h1>Q-Verse Forge Admin</h1>
+    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 1100 }}>
+      <h1>Q-Verse Forge Admin V12.1</h1>
       <p>Manage providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
 
-      <section style={{ marginTop: 24 }}>
-        <h2>Provider API Keys</h2>
-        <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-          <option value="openai">OpenAI</option>
-          <option value="claude">Claude</option>
-          <option value="gemini">Gemini</option>
-          <option value="deepseek">DeepSeek</option>
-          <option value="qwen">Qwen</option>
-        </select>
-        <input
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          placeholder="Enter API key"
-          type="text"
-          style={{ marginLeft: 8, width: 360 }}
-        />
-        <button onClick={saveProviderKey} style={{ marginLeft: 8 }}>Save Key</button>
-      </section>
-
-      <section style={{ marginTop: 24 }}>
-        <h2>Projects</h2>
-        <input value={projectName} onChange={(e) => setProjectName(e.target.value)} placeholder="Project name" />
-        <button onClick={addProject} style={{ marginLeft: 8 }}>Add Project</button>
-      </section>
-
-      <section style={{ marginTop: 24 }}>
-        <h2>Agents</h2>
-        <input value={agentName} onChange={(e) => setAgentName(e.target.value)} placeholder="Agent name" />
-        <button onClick={addAgent} style={{ marginLeft: 8 }}>Add Agent</button>
-      </section>
-
-      <section style={{ marginTop: 24 }}>
-        <h2>Live Forge Status</h2>
-        <button onClick={refresh}>Refresh</button>
-        <pre style={{ background: "#111", color: "#0f0", padding: 16, overflow: "auto" }}>
-          {JSON.stringify(status, null, 2)}
-        </pre>
-      </section>
+      <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} />
+      <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} />
+      <AgentManager agentName={agentName} setAgentName={setAgentName} onAdd={addAgent} />
+      <PluginManager pluginName={pluginName} setPluginName={setPluginName} onAdd={addPlugin} />
+      <MemoryManager memoryKey={memoryKey} setMemoryKey={setMemoryKey} memoryValue={memoryValue} setMemoryValue={setMemoryValue} onSave={saveMemory} />
+      <TwitterDraftManager draftText={draftText} setDraftText={setDraftText} onDraft={createTwitterDraft} />
+      <SystemStatus status={status} onRefresh={refresh} />
 
       {message && (
         <section style={{ marginTop: 24 }}>
@@ -734,6 +828,12 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Telegram Runtime
 - Twitter Safe Draft Runtime
 - Admin Dashboard
+- Provider Manager UI
+- Project Manager UI
+- Agent Manager UI
+- Plugin Manager UI
+- Memory Manager UI
+- Twitter Draft Manager UI
 '''
 }
 
