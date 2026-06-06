@@ -111,9 +111,7 @@ class AIResponseEngine:
                     {
                         "role": "user",
                         "parts": [
-                            {"text": self._system_prompt(provider) + "
-
-User: " + prompt}
+                            {"text": self._system_prompt(provider) + "\n\nUser: " + prompt}
                         ],
                     }
                 ],
