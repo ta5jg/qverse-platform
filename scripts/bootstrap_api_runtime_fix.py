@@ -208,6 +208,42 @@ def get_orchestrator_metrics():
 def get_orchestrator_metrics_slash():
     return system_manager.get_metrics()
 ''',
+
+    "agent/memory/MemoryManager.py": '''class MemoryManager:
+    def __init__(self):
+        self._records = {}
+
+    def save(self, key, value):
+        self._records[key] = value
+        return {"status": "ok", "saved_key": key}
+
+    def save_memory(self, key: str, value):
+        return self.save(key, value)
+
+    def get(self, key):
+        if key in self._records:
+            return {"status": "ok", "key": key, "value": self._records[key]}
+        return {"status": "not_found", "key": key}
+
+    def recall(self, key: str):
+        result = self.get(key)
+        if result.get("status") == "ok":
+            return [{"key": key, "value": result.get("value")}]
+        return []
+
+    def list_items(self):
+        return {"status": "ok", "items": list(self._records.items())}
+
+    def list_memories(self):
+        result = self.list_items()
+        return [{"key": key, "value": value} for key, value in result.get("items", [])]
+
+    def health(self):
+        return {
+            "status": "healthy",
+            "item_count": len(self._records),
+        }
+'''
 }
 
 ROUTES_INIT_PATCH = '''from api.routes.agent_chat import router as agent_chat_router'''
@@ -261,7 +297,7 @@ def main():
         write_file(path, content, force=args.force)
     patch_routes_init()
     print(f"[SUMMARY] Runtime fixes generated: {len(FILES)}")
-    print("[API] Agent dashboard, orchestrator metrics, existing agents route and n8n chat endpoints ready")
+    print("[API] Agent dashboard, orchestrator metrics, memory compatibility, existing agents route and n8n chat endpoints ready")
     print("Q-Verse API Runtime Fix Complete")
 
 
