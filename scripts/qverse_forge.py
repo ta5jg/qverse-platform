@@ -423,7 +423,7 @@ def write_file(path, content, force=False):
     if target.exists() and not force:
         return False
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(content.strip() + "\\n", encoding="utf-8")
+    target.write_text(content.strip() + "\n", encoding="utf-8")
     return True
 
 
@@ -444,7 +444,13 @@ def patch_routes_init():
         text = "\\n".join(lines) + "\\n"
 
     if "enabled_routers = [" in text and "forge_router" not in text.split("enabled_routers = [", 1)[-1].split("]", 1)[0]:
-        text = text.replace("enabled_routers = [", "enabled_routers = [\\n    forge_router,")
+        text = text.replace("enabled_routers = [", "enabled_routers = [\n    forge_router,")
+
+    if "ROUTE_REGISTRY: List[RouteDefinition] = [" in text and 'RouteDefinition("forge", "/forge", forge_router)' not in text:
+        text = text.replace(
+            "ROUTE_REGISTRY: List[RouteDefinition] = [",
+            "ROUTE_REGISTRY: List[RouteDefinition] = [\n    RouteDefinition(\"forge\", \"/forge\", forge_router),"
+        )
 
     init_path.write_text(text, encoding="utf-8")
     return {"patched": True}
@@ -469,6 +475,9 @@ def run_compile_checks():
         "memory/vector/VectorMemory.py",
         "security/PermissionLayer.py",
         "audit/AuditLogger.py",
+        "integrations/twitter/TwitterRuntime.py",
+        "integrations/github/GitHubRuntime.py",
+        "integrations/telegram/TelegramRuntime.py",
     ]
     results = {}
     for item in checks:
@@ -485,6 +494,8 @@ def write_report(written, skipped, scan, route_patch, compile_results):
     report = {
         "version": VERSION,
         "status": "forge_complete",
+        "route_registry_target": "ROUTE_REGISTRY",
+        "self_healing": True,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "written_count": len(written),
         "skipped_count": len(skipped),
