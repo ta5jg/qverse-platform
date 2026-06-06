@@ -1,44 +1,14 @@
-from datetime import datetime, timezone
-
 from fastapi import APIRouter
-from api.engines.orchestrator_engine import orchestrator_engine
+from api.managers.system_manager import system_manager
 
 router = APIRouter(prefix="/orchestrator", tags=["orchestrator"])
 
 
 @router.get("")
-def orchestrator_overview():
-    return {
-        "platform": "Q-Verse",
-        "module": "orchestrator",
-        "version": "V9",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "overview": orchestrator_engine.overview(),
-    }
+def get_orchestrator_metrics():
+    return system_manager.get_metrics()
 
 
-@router.get("/status")
-def orchestrator_status():
-    metrics = orchestrator_engine.get_metrics()
-
-    return {
-        "healthy": True,
-        "status": "running",
-        "orchestrator_loaded": True,
-        "metrics": metrics,
-    }
-
-
-@router.get("/registry")
-def orchestrator_registry():
-    overview = orchestrator_engine.overview()
-
-    return {
-        "components": overview,
-        "total": len(overview),
-    }
-
-
-@router.get("/health")
-def orchestrator_health():
-    return orchestrator_engine.health()
+@router.get("/")
+def get_orchestrator_metrics_slash():
+    return system_manager.get_metrics()

@@ -31,6 +31,7 @@ from api.routes.system import router as system_router
 from api.routes.tasks import router as tasks_router
 from api.routes.telemetry import router as telemetry_router
 from api.routes.workflows import router as workflows_router
+from api.routes.agent_chat import router as agent_chat_router
 
 ROUTES_VERSION = "V9"
 ROUTES_STATUS = "V9_ENTERPRISE_COMPLETE"
