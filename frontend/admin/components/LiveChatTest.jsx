@@ -1,9 +1,11 @@
 export default function LiveChatTest({ chatMessage, setChatMessage, chatResult, onSend, loading }) {
-  const provider = chatResult?.runtime?.ai_response?.result?.provider || chatResult?.ai_response?.result?.provider;
-  const fallback = chatResult?.runtime?.ai_response?.result?.fallback_used ?? chatResult?.ai_response?.result?.fallback_used;
+  const aiResult = chatResult?.runtime?.ai_response?.result || chatResult?.ai_response?.result || {};
+  const provider = aiResult?.provider;
+  const fallback = aiResult?.fallback_used;
+  const response = aiResult?.response || chatResult?.reply || "Henüz test yapılmadı.";
 
   return (
-    <section className="card chat-card accent-purple">
+    <section className="card chat-card accent-purple" id="live-chat">
       <div className="card-header">
         <div>
           <p className="eyebrow">Live Runtime</p>
@@ -14,9 +16,9 @@ export default function LiveChatTest({ chatMessage, setChatMessage, chatResult, 
       </div>
       <div className="chat-window">
         <div className="bubble user">{chatMessage || "Bu cevabı hangi provider üretiyor?"}</div>
-        <div className="bubble bot">{chatResult?.reply || "Henüz test yapılmadı."}</div>
+        <div className="bubble bot">{response}</div>
       </div>
-      <div className="form-row">
+      <div className="form-row chat-input-row">
         <input value={chatMessage} onChange={(e) => setChatMessage(e.target.value)} placeholder="Mesajınızı yazın..." />
         <button className="btn purple" onClick={onSend} disabled={loading}>{loading ? "Testing..." : "Gönder"}</button>
       </div>

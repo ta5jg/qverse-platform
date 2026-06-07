@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AgentManager from "../components/AgentManager.jsx";
 import LiveChatTest from "../components/LiveChatTest.jsx";
 import MemoryManager from "../components/MemoryManager.jsx";
@@ -11,8 +11,21 @@ import TwitterDraftManager from "../components/TwitterDraftManager.jsx";
 
 const API_BASE = "https://api.q-verse.io";
 
+const sections = [
+  { id: "dashboard", label: "Dashboard" },
+  { id: "providers", label: "Providers" },
+  { id: "projects", label: "Projects" },
+  { id: "agents", label: "Agents" },
+  { id: "plugins", label: "Plugins" },
+  { id: "live-chat", label: "Live Chat" },
+  { id: "memory", label: "Memory" },
+  { id: "twitter", label: "Twitter/X" },
+  { id: "system", label: "System Status" },
+];
+
 export default function ForgeAdmin() {
   const [status, setStatus] = useState(null);
+  const [activeSection, setActiveSection] = useState("dashboard");
   const [provider, setProvider] = useState("openai");
   const [apiKey, setApiKey] = useState("");
   const [projectName, setProjectName] = useState("");
@@ -30,6 +43,8 @@ export default function ForgeAdmin() {
   const projects = status?.projects || {};
   const agents = status?.agents || {};
   const plugins = status?.plugins || {};
+
+  const sectionTitle = useMemo(() => sections.find((item) => item.id === activeSection)?.label || "Dashboard", [activeSection]);
 
   async function refresh() {
     const res = await fetch(`${API_BASE}/forge/status`);
@@ -54,27 +69,32 @@ export default function ForgeAdmin() {
   }
 
   async function addProject() {
+    if (!projectName.trim()) return;
     await postJson("/forge/projects", { name: projectName, config: { source: "admin", status: "active" } });
     setProjectName("");
   }
 
   async function addAgent() {
+    if (!agentName.trim()) return;
     await postJson("/forge/agents", { name: agentName, config: { source: "admin", status: "running" } });
     setAgentName("");
   }
 
   async function addPlugin() {
+    if (!pluginName.trim()) return;
     await postJson("/forge/plugins", { name: pluginName, config: { source: "admin", enabled: true } });
     setPluginName("");
   }
 
   async function saveMemory() {
+    if (!memoryKey.trim()) return;
     await postJson("/forge/memory/save", { namespace: "admin", key: memoryKey, value: memoryValue });
     setMemoryKey("");
     setMemoryValue("");
   }
 
   async function createTwitterDraft() {
+    if (!draftText.trim()) return;
     await postJson("/forge/twitter/draft", { text: draftText });
     setDraftText("");
   }
@@ -98,6 +118,11 @@ export default function ForgeAdmin() {
     }
   }
 
+  function showSection(id) {
+    setActiveSection(id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   useEffect(() => { refresh(); }, []);
 
   return (
@@ -105,53 +130,52 @@ export default function ForgeAdmin() {
       <aside className="sidebar">
         <div className="brand"><div className="logo">Q</div><strong>Q-Verse Forge</strong></div>
         <nav>
-          <a className="active">Dashboard</a>
-          <a>Providers</a>
-          <a>Projects</a>
-          <a>Agents</a>
-          <a>Plugins</a>
-          <a>Memory</a>
-          <a>Twitter/X</a>
-          <a>System Status</a>
+          {sections.map((item) => (
+            <button key={item.id} className={activeSection === item.id ? "active" : ""} onClick={() => showSection(item.id)}>
+              {item.label}
+            </button>
+          ))}
         </nav>
         <div className="sidebar-foot"><span className="dot ok"></span> Ultimate V12.2</div>
       </aside>
 
       <main className="dashboard">
-        <header className="topbar">
+        <header className="topbar" id="dashboard">
           <div>
             <p className="eyebrow">Q-Verse Platform</p>
             <h1>Q-Verse Forge Admin <span>V12.2</span></h1>
-            <p className="muted">Manage providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
+            <p className="muted">{sectionTitle} paneli: providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
           </div>
           <div className="user-card"><span className="dot ok"></span> System Online</div>
         </header>
 
-        <section className="stats-grid">
-          <div className="stat"><span>Providers</span><strong>{Object.keys(providers).length}</strong><small>Available</small></div>
-          <div className="stat"><span>Projects</span><strong>{Object.keys(projects).length}</strong><small>Active</small></div>
-          <div className="stat"><span>Agents</span><strong>{Object.keys(agents).length}</strong><small>Running</small></div>
-          <div className="stat"><span>Plugins</span><strong>{Object.keys(plugins).length}</strong><small>Installed</small></div>
-        </section>
+        {activeSection === "dashboard" && (
+          <>
+            <section className="stats-grid">
+              <div className="stat"><span>Providers</span><strong>{Object.keys(providers).length}</strong><small>Available</small></div>
+              <div className="stat"><span>Projects</span><strong>{Object.keys(projects).length}</strong><small>Active</small></div>
+              <div className="stat"><span>Agents</span><strong>{Object.keys(agents).length}</strong><small>Running</small></div>
+              <div className="stat"><span>Plugins</span><strong>{Object.keys(plugins).length}</strong><small>Installed</small></div>
+            </section>
+            <section className="grid two">
+              <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} providers={providers} />
+              <LiveChatTest chatMessage={chatMessage} setChatMessage={setChatMessage} chatResult={chatResult} onSend={sendChatTest} loading={loading} />
+            </section>
+            <section className="grid two">
+              <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} projects={projects} />
+              <ProviderTest providers={providers} onTest={testProviders} loading={loading} />
+            </section>
+          </>
+        )}
 
-        <section className="grid four">
-          <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} providers={providers} />
-          <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} projects={projects} />
-          <AgentManager agentName={agentName} setAgentName={setAgentName} onAdd={addAgent} agents={agents} />
-          <PluginManager pluginName={pluginName} setPluginName={setPluginName} onAdd={addPlugin} plugins={plugins} />
-        </section>
-
-        <section className="grid two">
-          <LiveChatTest chatMessage={chatMessage} setChatMessage={setChatMessage} chatResult={chatResult} onSend={sendChatTest} loading={loading} />
-          <ProviderTest providers={providers} onTest={testProviders} loading={loading} />
-        </section>
-
-        <section className="grid two">
-          <MemoryManager memoryKey={memoryKey} setMemoryKey={setMemoryKey} memoryValue={memoryValue} setMemoryValue={setMemoryValue} onSave={saveMemory} />
-          <TwitterDraftManager draftText={draftText} setDraftText={setDraftText} onDraft={createTwitterDraft} />
-        </section>
-
-        <SystemStatus status={status} onRefresh={refresh} />
+        {activeSection === "providers" && <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} providers={providers} />}
+        {activeSection === "projects" && <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} projects={projects} />}
+        {activeSection === "agents" && <AgentManager agentName={agentName} setAgentName={setAgentName} onAdd={addAgent} agents={agents} />}
+        {activeSection === "plugins" && <PluginManager pluginName={pluginName} setPluginName={setPluginName} onAdd={addPlugin} plugins={plugins} />}
+        {activeSection === "live-chat" && <LiveChatTest chatMessage={chatMessage} setChatMessage={setChatMessage} chatResult={chatResult} onSend={sendChatTest} loading={loading} />}
+        {activeSection === "memory" && <MemoryManager memoryKey={memoryKey} setMemoryKey={setMemoryKey} memoryValue={memoryValue} setMemoryValue={setMemoryValue} onSave={saveMemory} />}
+        {activeSection === "twitter" && <TwitterDraftManager draftText={draftText} setDraftText={setDraftText} onDraft={createTwitterDraft} />}
+        {activeSection === "system" && <SystemStatus status={status} onRefresh={refresh} />}
 
         {message && <pre className="last-action">{message}</pre>}
       </main>
