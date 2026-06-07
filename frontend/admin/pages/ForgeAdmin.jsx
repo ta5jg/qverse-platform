@@ -12,15 +12,15 @@ import TwitterDraftManager from "../components/TwitterDraftManager.jsx";
 const API_BASE = "https://api.q-verse.io";
 
 const sections = [
-  { id: "dashboard", label: "Dashboard" },
-  { id: "providers", label: "Providers" },
-  { id: "projects", label: "Projects" },
-  { id: "agents", label: "Agents" },
-  { id: "plugins", label: "Plugins" },
-  { id: "live-chat", label: "Live Chat" },
-  { id: "memory", label: "Memory" },
-  { id: "twitter", label: "Twitter/X" },
-  { id: "system", label: "System Status" },
+  { id: "dashboard", label: "Dashboard", subtitle: "Genel sistem özeti" },
+  { id: "providers", label: "Providers", subtitle: "API key ve provider yönetimi" },
+  { id: "projects", label: "Projects", subtitle: "Proje kayıt ve izleme" },
+  { id: "agents", label: "Agents", subtitle: "Agent kayıt ve çalışma durumu" },
+  { id: "plugins", label: "Plugins", subtitle: "Plugin ve entegrasyon kayıtları" },
+  { id: "live-chat", label: "Live Chat", subtitle: "Canlı AI cevap testi" },
+  { id: "memory", label: "Memory", subtitle: "Kalıcı hafıza kayıtları" },
+  { id: "twitter", label: "Twitter/X", subtitle: "Güvenli sosyal medya taslakları" },
+  { id: "system", label: "System Status", subtitle: "Ham sistem durumu ve JSON" },
 ];
 
 export default function ForgeAdmin() {
@@ -44,7 +44,7 @@ export default function ForgeAdmin() {
   const agents = status?.agents || {};
   const plugins = status?.plugins || {};
 
-  const sectionTitle = useMemo(() => sections.find((item) => item.id === activeSection)?.label || "Dashboard", [activeSection]);
+  const activeMeta = useMemo(() => sections.find((item) => item.id === activeSection) || sections[0], [activeSection]);
 
   async function refresh() {
     const res = await fetch(`${API_BASE}/forge/status`);
@@ -120,10 +120,25 @@ export default function ForgeAdmin() {
 
   function showSection(id) {
     setActiveSection(id);
+    window.history.replaceState(null, "", `#${id}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+    const initial = window.location.hash.replace("#", "");
+    if (sections.some((item) => item.id === initial)) {
+      setActiveSection(initial);
+    }
+    const onHashChange = () => {
+      const next = window.location.hash.replace("#", "");
+      if (sections.some((item) => item.id === next)) {
+        setActiveSection(next);
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   return (
     <div className="app-shell">
@@ -131,8 +146,15 @@ export default function ForgeAdmin() {
         <div className="brand"><div className="logo">Q</div><strong>Q-Verse Forge</strong></div>
         <nav>
           {sections.map((item) => (
-            <button key={item.id} className={activeSection === item.id ? "active" : ""} onClick={() => showSection(item.id)}>
-              {item.label}
+            <button
+              key={item.id}
+              type="button"
+              className={activeSection === item.id ? "active" : ""}
+              onClick={() => showSection(item.id)}
+              aria-current={activeSection === item.id ? "page" : undefined}
+            >
+              <span>{item.label}</span>
+              <small>{item.subtitle}</small>
             </button>
           ))}
         </nav>
@@ -144,10 +166,18 @@ export default function ForgeAdmin() {
           <div>
             <p className="eyebrow">Q-Verse Platform</p>
             <h1>Q-Verse Forge Admin <span>V12.2</span></h1>
-            <p className="muted">{sectionTitle} paneli: providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
+            <p className="muted"><strong>{activeMeta.label}</strong> — {activeMeta.subtitle}</p>
           </div>
           <div className="user-card"><span className="dot ok"></span> System Online</div>
         </header>
+        <section className="section-banner">
+          <div>
+            <p className="eyebrow">Active Section</p>
+            <h2>{activeMeta.label}</h2>
+            <p className="muted">{activeMeta.subtitle}</p>
+          </div>
+          <span className="pill purple">#{activeSection}</span>
+        </section>
 
         {activeSection === "dashboard" && (
           <>
