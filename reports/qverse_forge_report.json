@@ -3,7 +3,7 @@
   "status": "forge_complete",
   "route_registry_target": "ROUTE_REGISTRY",
   "self_healing": true,
-  "timestamp": "2026-06-07T02:17:55.966117+00:00",
+  "timestamp": "2026-06-07T13:34:36.541484+00:00",
   "written_count": 41,
   "skipped_count": 0,
   "written": [
@@ -52,12 +52,8 @@
   "skipped": [],
   "scan_before": {
     "required": 41,
-    "missing": [
-      "frontend/admin/components/LiveChatTest.jsx",
-      "frontend/admin/components/ProviderTest.jsx",
-      "frontend/admin/styles.css"
-    ],
-    "missing_count": 3
+    "missing": [],
+    "missing_count": 0
   },
   "scan_after": {
     "required": 41,
@@ -88,8 +84,9 @@
     "integrations/github/GitHubRuntime.py": "ok",
     "integrations/telegram/TelegramRuntime.py": "ok",
     "ai/response/AIResponseEngine.py": "ok",
-    "frontend/admin/components/LiveChatTest.jsx": "  File \"/Users/irfangedik/qverse-platform/frontend/admin/components/LiveChatTest.jsx\", line 23\n    {provider && <p className=\"hint\">Provider: {provider} · fallback: {String(Boolean(fallback))}</p>}\n                                                          ^\nSyntaxError: invalid character '·' (U+00B7)\n",
-    "frontend/admin/components/ProviderTest.jsx": "  File \"/Users/irfangedik/qverse-platform/frontend/admin/components/ProviderTest.jsx\", line 1\n    export default function ProviderTest({ providers = {}, onTest, loading }) {\n           ^^^^^^^\nSyntaxError: invalid syntax\n"
+    "frontend/admin/components/LiveChatTest.jsx": "  File \"/Users/irfangedik/qverse-platform/frontend/admin/components/LiveChatTest.jsx\", line 25\n    {provider && <p className=\"hint\">Provider: {provider} · fallback: {String(Boolean(fallback))}</p>}\n                                                          ^\nSyntaxError: invalid character '·' (U+00B7)\n",
+    "frontend/admin/components/ProviderTest.jsx": "  File \"/Users/irfangedik/qverse-platform/frontend/admin/components/ProviderTest.jsx\", line 1\n    export default function ProviderTest({ providers = {}, onTest, loading }) {\n           ^^^^^^^\nSyntaxError: invalid syntax\n",
+    "frontend/admin/styles.css": "  File \"/Users/irfangedik/qverse-platform/frontend/admin/styles.css\", line 9\n    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top left, #123a68 0, transparent 34%), #07111f; }\n                                    ^\nSyntaxError: invalid decimal literal\n"
   },
   "endpoints": [
     "/forge/status",
