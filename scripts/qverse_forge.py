@@ -1487,7 +1487,8 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Project Registry
 - Plugin System
 - Workflow Engine
-- Tool Execution Engine
+- Tool Execution Engine V12.2
+- Event Bus
 - Event Bus
 - Task Queue
 - Persistent Memory
