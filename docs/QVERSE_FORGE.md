@@ -8,6 +8,7 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Project Registry
 - Plugin System
 - Workflow Engine
+- Tool Execution Engine
 - Event Bus
 - Task Queue
 - Persistent Memory

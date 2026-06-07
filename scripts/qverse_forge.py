@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parent.parent
 VERSION = "QVERSE_FORGE_V1"
 
 REQUIRED_DIRS = [
-    "agent/registry", "agent/supervisor", "agent/workers", "agent/scheduler",
+    "agent/registry", "agent/supervisor", "agent/workers", "agent/scheduler", "agent/tools",
     "agent/coordination", "agent/events", "agent/workflows", "agent/plugins",
     "memory/core", "memory/storage", "memory/vector", "memory/project",
     "ai/providers", "ai/router", "ai/response", "ai/monitoring", "ai/cost",
@@ -121,6 +121,22 @@ class WorkflowEngine:
         return {"success": True, "workflow": name, "payload": payload or {}, "steps": workflow["steps"]}
 
 workflow_engine = WorkflowEngine()
+''',
+
+"agent/tools/ToolExecutionEngine.py": '''
+class ToolExecutionEngine:
+    def execute(self, tool_name: str, payload=None):
+        return {
+            "tool": tool_name,
+            "payload": payload or {},
+            "status": "ready",
+            "result": f"Tool {tool_name} is registered in Q-Verse Runtime V12.2.",
+            "version": "V12.2",
+            "legacy": False,
+        }
+
+
+tool_execution_engine = ToolExecutionEngine()
 ''',
 
     "memory/storage/PersistentMemory.py": '''
@@ -1471,6 +1487,7 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Project Registry
 - Plugin System
 - Workflow Engine
+- Tool Execution Engine
 - Event Bus
 - Task Queue
 - Persistent Memory
@@ -1554,6 +1571,7 @@ def run_compile_checks():
         "agent/registry/ProjectRegistry.py",
         "agent/plugins/PluginRegistry.py",
         "agent/workflows/WorkflowEngine.py",
+        "agent/tools/ToolExecutionEngine.py",
         "memory/storage/PersistentMemory.py",
         "memory/vector/VectorMemory.py",
         "security/PermissionLayer.py",

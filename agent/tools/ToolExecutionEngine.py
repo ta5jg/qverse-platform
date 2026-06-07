@@ -4,5 +4,10 @@ class ToolExecutionEngine:
             "tool": tool_name,
             "payload": payload or {},
             "status": "ready",
-            "result": f"Tool {tool_name} is available in Q-Verse Agent V9.",
+            "result": f"Tool {tool_name} is registered in Q-Verse Runtime V12.2.",
+            "version": "V12.2",
+            "legacy": False,
         }
+
+
+tool_execution_engine = ToolExecutionEngine()
