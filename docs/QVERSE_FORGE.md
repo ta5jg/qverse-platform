@@ -27,3 +27,5 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Twitter Draft Manager UI
 - Forge Admin Vite App
 - Forge Admin Nginx Deploy Snippet
+- Live Chat Test UI
+- Provider Test UI

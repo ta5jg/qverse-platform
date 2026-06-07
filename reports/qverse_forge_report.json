@@ -3,8 +3,8 @@
   "status": "forge_complete",
   "route_registry_target": "ROUTE_REGISTRY",
   "self_healing": true,
-  "timestamp": "2026-06-06T23:37:36.845878+00:00",
-  "written_count": 38,
+  "timestamp": "2026-06-07T02:17:55.966117+00:00",
+  "written_count": 41,
   "skipped_count": 0,
   "written": [
     "agent/events/EventBus.py",
@@ -35,8 +35,11 @@
     "frontend/admin/components/PluginManager.jsx",
     "frontend/admin/components/MemoryManager.jsx",
     "frontend/admin/components/TwitterDraftManager.jsx",
+    "frontend/admin/components/LiveChatTest.jsx",
+    "frontend/admin/components/ProviderTest.jsx",
     "frontend/admin/pages/ForgeAdmin.jsx",
     "frontend/admin/main.jsx",
+    "frontend/admin/styles.css",
     "frontend/admin/index.html",
     "frontend/admin/vite.config.js",
     "frontend/admin/package.json",
@@ -48,12 +51,16 @@
   ],
   "skipped": [],
   "scan_before": {
-    "required": 38,
-    "missing": [],
-    "missing_count": 0
+    "required": 41,
+    "missing": [
+      "frontend/admin/components/LiveChatTest.jsx",
+      "frontend/admin/components/ProviderTest.jsx",
+      "frontend/admin/styles.css"
+    ],
+    "missing_count": 3
   },
   "scan_after": {
-    "required": 38,
+    "required": 41,
     "missing": [],
     "missing_count": 0
   },
@@ -80,7 +87,9 @@
     "integrations/twitter/TwitterRuntime.py": "ok",
     "integrations/github/GitHubRuntime.py": "ok",
     "integrations/telegram/TelegramRuntime.py": "ok",
-    "ai/response/AIResponseEngine.py": "ok"
+    "ai/response/AIResponseEngine.py": "ok",
+    "frontend/admin/components/LiveChatTest.jsx": "  File \"/Users/irfangedik/qverse-platform/frontend/admin/components/LiveChatTest.jsx\", line 23\n    {provider && <p className=\"hint\">Provider: {provider} · fallback: {String(Boolean(fallback))}</p>}\n                                                          ^\nSyntaxError: invalid character '·' (U+00B7)\n",
+    "frontend/admin/components/ProviderTest.jsx": "  File \"/Users/irfangedik/qverse-platform/frontend/admin/components/ProviderTest.jsx\", line 1\n    export default function ProviderTest({ providers = {}, onTest, loading }) {\n           ^^^^^^^\nSyntaxError: invalid syntax\n"
   },
   "endpoints": [
     "/forge/status",

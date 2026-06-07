@@ -774,70 +774,130 @@ def audit(event: str, payload: Dict[str, Any]):
 
 
     "frontend/admin/components/SystemStatus.jsx": '''export default function SystemStatus({ status, onRefresh }) {
+  const providers = status?.provider_admin || {};
+  const projects = status?.projects || {};
+  const agents = status?.agents || {};
+  const plugins = status?.plugins || {};
+
   return (
-    <section style={{ marginTop: 24 }}>
-      <h2>System Status</h2>
-      <button onClick={onRefresh}>Refresh</button>
-      <pre style={{ background: "#111", color: "#0f0", padding: 16, overflow: "auto" }}>
-        {JSON.stringify(status, null, 2)}
-      </pre>
+    <section className="card system-card">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">System</p>
+          <h2>Runtime Status</h2>
+        </div>
+        <button className="btn ghost" onClick={onRefresh}>Refresh</button>
+      </div>
+      <div className="stats-grid compact">
+        <div className="stat"><span>Providers</span><strong>{Object.keys(providers).length}</strong></div>
+        <div className="stat"><span>Projects</span><strong>{Object.keys(projects).length}</strong></div>
+        <div className="stat"><span>Agents</span><strong>{Object.keys(agents).length}</strong></div>
+        <div className="stat"><span>Plugins</span><strong>{Object.keys(plugins).length}</strong></div>
+      </div>
+      <pre className="status-json">{JSON.stringify(status, null, 2)}</pre>
     </section>
   );
 }
 ''',
 
-    "frontend/admin/components/ProviderManager.jsx": '''export default function ProviderManager({ provider, setProvider, apiKey, setApiKey, onSave }) {
+    "frontend/admin/components/ProviderManager.jsx": '''const providerLabels = {
+  openai: "OpenAI",
+  claude: "Claude",
+  gemini: "Gemini",
+  deepseek: "DeepSeek",
+  qwen: "Qwen",
+};
+
+export default function ProviderManager({ provider, setProvider, apiKey, setApiKey, onSave, providers = {} }) {
+  const active = providers?.[provider];
+
   return (
-    <section style={{ marginTop: 24 }}>
-      <h2>Provider API Keys</h2>
-      <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-        <option value="openai">OpenAI</option>
-        <option value="claude">Claude</option>
-        <option value="gemini">Gemini</option>
-        <option value="deepseek">DeepSeek</option>
-        <option value="qwen">Qwen</option>
-      </select>
-      <input
-        value={apiKey}
-        onChange={(e) => setApiKey(e.target.value)}
-        placeholder="Enter API key"
-        type="text"
-        style={{ marginLeft: 8, width: 360 }}
-      />
-      <button onClick={onSave} style={{ marginLeft: 8 }}>Save Key</button>
+    <section className="card accent-blue">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Providers</p>
+          <h2>Provider API Keys</h2>
+          <p className="muted">Manage live AI provider keys securely.</p>
+        </div>
+        <span className={active?.configured ? "pill ok" : "pill warn"}>{active?.configured ? "Configured" : "Missing"}</span>
+      </div>
+      <div className="form-row">
+        <select value={provider} onChange={(e) => setProvider(e.target.value)}>
+          {Object.entries(providerLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+        </select>
+        <input value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="Enter API key" type="password" />
+        <button className="btn primary" onClick={onSave}>Save Key</button>
+      </div>
+      <p className="hint">Current key: {active?.masked || "not configured"}</p>
     </section>
   );
 }
 ''',
 
-    "frontend/admin/components/ProjectManager.jsx": '''export default function ProjectManager({ projectName, setProjectName, onAdd }) {
+    "frontend/admin/components/ProjectManager.jsx": '''export default function ProjectManager({ projectName, setProjectName, onAdd, projects = {} }) {
   return (
-    <section style={{ marginTop: 24 }}>
-      <h2>Projects</h2>
-      <input value={projectName} onChange={(e) => setProjectName(e.target.value)} placeholder="Project name" />
-      <button onClick={onAdd} style={{ marginLeft: 8 }}>Add Project</button>
+    <section className="card accent-green">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Core</p>
+          <h2>Projects</h2>
+          <p className="muted">Create and manage Q-Verse projects.</p>
+        </div>
+        <span className="pill ok">{Object.keys(projects).length} Active</span>
+      </div>
+      <div className="form-row">
+        <input value={projectName} onChange={(e) => setProjectName(e.target.value)} placeholder="Project name" />
+        <button className="btn success" onClick={onAdd}>Add Project</button>
+      </div>
+      <ul className="mini-list">
+        {Object.entries(projects).slice(0, 5).map(([name, cfg]) => <li key={name}><span>{name}</span><b>{cfg?.status || "active"}</b></li>)}
+      </ul>
     </section>
   );
 }
 ''',
 
-    "frontend/admin/components/AgentManager.jsx": '''export default function AgentManager({ agentName, setAgentName, onAdd }) {
+    "frontend/admin/components/AgentManager.jsx": '''export default function AgentManager({ agentName, setAgentName, onAdd, agents = {} }) {
   return (
-    <section style={{ marginTop: 24 }}>
-      <h2>Agents</h2>
-      <input value={agentName} onChange={(e) => setAgentName(e.target.value)} placeholder="Agent name" />
-      <button onClick={onAdd} style={{ marginLeft: 8 }}>Add Agent</button>
+    <section className="card accent-purple">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Runtime</p>
+          <h2>Agents</h2>
+          <p className="muted">Create and manage AI agents.</p>
+        </div>
+        <span className="pill ok">{Object.keys(agents).length} Running</span>
+      </div>
+      <div className="form-row">
+        <input value={agentName} onChange={(e) => setAgentName(e.target.value)} placeholder="Agent name" />
+        <button className="btn purple" onClick={onAdd}>Add Agent</button>
+      </div>
+      <ul className="mini-list">
+        {Object.entries(agents).slice(0, 5).map(([name, cfg]) => <li key={name}><span>{name}</span><b>{cfg?.status || "active"}</b></li>)}
+      </ul>
     </section>
   );
 }
 ''',
 
-    "frontend/admin/components/PluginManager.jsx": '''export default function PluginManager({ pluginName, setPluginName, onAdd }) {
+    "frontend/admin/components/PluginManager.jsx": '''export default function PluginManager({ pluginName, setPluginName, onAdd, plugins = {} }) {
   return (
-    <section style={{ marginTop: 24 }}>
-      <h2>Plugins</h2>
-      <input value={pluginName} onChange={(e) => setPluginName(e.target.value)} placeholder="Plugin name" />
-      <button onClick={onAdd} style={{ marginLeft: 8 }}>Add Plugin</button>
+    <section className="card accent-teal">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Extensions</p>
+          <h2>Plugins</h2>
+          <p className="muted">Install and manage integrations.</p>
+        </div>
+        <span className="pill ok">{Object.keys(plugins).length} Installed</span>
+      </div>
+      <div className="form-row">
+        <input value={pluginName} onChange={(e) => setPluginName(e.target.value)} placeholder="Plugin name" />
+        <button className="btn success" onClick={onAdd}>Add Plugin</button>
+      </div>
+      <ul className="mini-list">
+        {Object.entries(plugins).slice(0, 5).map(([name, cfg]) => <li key={name}><span>{name}</span><b>{cfg?.enabled === false ? "disabled" : "enabled"}</b></li>)}
+      </ul>
     </section>
   );
 }
@@ -845,16 +905,19 @@ def audit(event: str, payload: Dict[str, Any]):
 
     "frontend/admin/components/MemoryManager.jsx": '''export default function MemoryManager({ memoryKey, setMemoryKey, memoryValue, setMemoryValue, onSave }) {
   return (
-    <section style={{ marginTop: 24 }}>
-      <h2>Memory</h2>
-      <input value={memoryKey} onChange={(e) => setMemoryKey(e.target.value)} placeholder="Memory key" />
-      <input
-        value={memoryValue}
-        onChange={(e) => setMemoryValue(e.target.value)}
-        placeholder="Memory value"
-        style={{ marginLeft: 8, width: 360 }}
-      />
-      <button onClick={onSave} style={{ marginLeft: 8 }}>Save Memory</button>
+    <section className="card">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Memory</p>
+          <h2>Memory Manager</h2>
+          <p className="muted">Save persistent memory values.</p>
+        </div>
+      </div>
+      <div className="form-row">
+        <input value={memoryKey} onChange={(e) => setMemoryKey(e.target.value)} placeholder="Memory key" />
+        <input value={memoryValue} onChange={(e) => setMemoryValue(e.target.value)} placeholder="Memory value" />
+        <button className="btn primary" onClick={onSave}>Save Memory</button>
+      </div>
     </section>
   );
 }
@@ -862,16 +925,68 @@ def audit(event: str, payload: Dict[str, Any]):
 
     "frontend/admin/components/TwitterDraftManager.jsx": '''export default function TwitterDraftManager({ draftText, setDraftText, onDraft }) {
   return (
-    <section style={{ marginTop: 24 }}>
-      <h2>Twitter/X Draft Queue</h2>
-      <textarea
-        value={draftText}
-        onChange={(e) => setDraftText(e.target.value)}
-        placeholder="Draft safe-mode post"
-        rows={4}
-        style={{ width: "100%" }}
-      />
-      <button onClick={onDraft} style={{ marginTop: 8 }}>Create Draft</button>
+    <section className="card">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Integrations</p>
+          <h2>Twitter/X Draft Queue</h2>
+          <p className="muted">Create safe-mode social media drafts.</p>
+        </div>
+      </div>
+      <textarea value={draftText} onChange={(e) => setDraftText(e.target.value)} placeholder="Draft safe-mode post" rows={4} />
+      <button className="btn primary full" onClick={onDraft}>Create Draft</button>
+    </section>
+  );
+}
+''',
+    "frontend/admin/components/LiveChatTest.jsx": '''export default function LiveChatTest({ chatMessage, setChatMessage, chatResult, onSend, loading }) {
+  const provider = chatResult?.runtime?.ai_response?.result?.provider || chatResult?.ai_response?.result?.provider;
+  const fallback = chatResult?.runtime?.ai_response?.result?.fallback_used ?? chatResult?.ai_response?.result?.fallback_used;
+
+  return (
+    <section className="card chat-card accent-purple">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Live Runtime</p>
+          <h2>Live Chat Test</h2>
+          <p className="muted">Test the AI response engine in real time.</p>
+        </div>
+        <span className="pill purple">V12.2 Engine</span>
+      </div>
+      <div className="chat-window">
+        <div className="bubble user">{chatMessage || "Bu cevabı hangi provider üretiyor?"}</div>
+        <div className="bubble bot">{chatResult?.reply || "Henüz test yapılmadı."}</div>
+      </div>
+      <div className="form-row">
+        <input value={chatMessage} onChange={(e) => setChatMessage(e.target.value)} placeholder="Mesajınızı yazın..." />
+        <button className="btn purple" onClick={onSend} disabled={loading}>{loading ? "Testing..." : "Gönder"}</button>
+      </div>
+      {provider && <p className="hint">Provider: {provider} · fallback: {String(Boolean(fallback))}</p>}
+    </section>
+  );
+}
+''',
+
+    "frontend/admin/components/ProviderTest.jsx": '''export default function ProviderTest({ providers = {}, onTest, loading }) {
+  return (
+    <section className="card accent-yellow">
+      <div className="card-header">
+        <div>
+          <p className="eyebrow">Diagnostics</p>
+          <h2>Provider Test</h2>
+          <p className="muted">Check configured provider status.</p>
+        </div>
+        <button className="btn ghost" onClick={onTest} disabled={loading}>{loading ? "Testing..." : "Test All"}</button>
+      </div>
+      <div className="provider-table">
+        {Object.entries(providers).map(([name, info]) => (
+          <div className="provider-row" key={name}>
+            <strong>{name}</strong>
+            <span className={info?.configured ? "status ok" : "status warn"}>{info?.configured ? "Configured" : "Missing"}</span>
+            <small>{info?.masked || info?.env_key}</small>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
@@ -879,10 +994,12 @@ def audit(event: str, payload: Dict[str, Any]):
 
     "frontend/admin/pages/ForgeAdmin.jsx": '''import { useEffect, useState } from "react";
 import AgentManager from "../components/AgentManager.jsx";
+import LiveChatTest from "../components/LiveChatTest.jsx";
 import MemoryManager from "../components/MemoryManager.jsx";
 import PluginManager from "../components/PluginManager.jsx";
 import ProjectManager from "../components/ProjectManager.jsx";
 import ProviderManager from "../components/ProviderManager.jsx";
+import ProviderTest from "../components/ProviderTest.jsx";
 import SystemStatus from "../components/SystemStatus.jsx";
 import TwitterDraftManager from "../components/TwitterDraftManager.jsx";
 
@@ -899,6 +1016,14 @@ export default function ForgeAdmin() {
   const [memoryValue, setMemoryValue] = useState("");
   const [draftText, setDraftText] = useState("");
   const [message, setMessage] = useState("");
+  const [chatMessage, setChatMessage] = useState("Bu cevabı hangi provider üretiyor?");
+  const [chatResult, setChatResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const providers = status?.provider_admin || {};
+  const projects = status?.projects || {};
+  const agents = status?.agents || {};
+  const plugins = status?.plugins || {};
 
   async function refresh() {
     const res = await fetch(`${API_BASE}/forge/status`);
@@ -923,17 +1048,17 @@ export default function ForgeAdmin() {
   }
 
   async function addProject() {
-    await postJson("/forge/projects", { name: projectName, config: { source: "admin" } });
+    await postJson("/forge/projects", { name: projectName, config: { source: "admin", status: "active" } });
     setProjectName("");
   }
 
   async function addAgent() {
-    await postJson("/forge/agents", { name: agentName, config: { source: "admin" } });
+    await postJson("/forge/agents", { name: agentName, config: { source: "admin", status: "running" } });
     setAgentName("");
   }
 
   async function addPlugin() {
-    await postJson("/forge/plugins", { name: pluginName, config: { source: "admin" } });
+    await postJson("/forge/plugins", { name: pluginName, config: { source: "admin", enabled: true } });
     setPluginName("");
   }
 
@@ -948,28 +1073,83 @@ export default function ForgeAdmin() {
     setDraftText("");
   }
 
+  async function sendChatTest() {
+    setLoading(true);
+    try {
+      const data = await postJson("/agents/chat", { message: chatMessage, source: "forge-admin", user_id: "admin" });
+      setChatResult(data);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function testProviders() {
+    setLoading(true);
+    try {
+      await sendChatTest();
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => { refresh(); }, []);
 
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 1100 }}>
-      <h1>Q-Verse Forge Admin V12.1</h1>
-      <p>Manage providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
+    <div className="app-shell">
+      <aside className="sidebar">
+        <div className="brand"><div className="logo">Q</div><strong>Q-Verse Forge</strong></div>
+        <nav>
+          <a className="active">Dashboard</a>
+          <a>Providers</a>
+          <a>Projects</a>
+          <a>Agents</a>
+          <a>Plugins</a>
+          <a>Memory</a>
+          <a>Twitter/X</a>
+          <a>System Status</a>
+        </nav>
+        <div className="sidebar-foot"><span className="dot ok"></span> Ultimate V12.2</div>
+      </aside>
 
-      <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} />
-      <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} />
-      <AgentManager agentName={agentName} setAgentName={setAgentName} onAdd={addAgent} />
-      <PluginManager pluginName={pluginName} setPluginName={setPluginName} onAdd={addPlugin} />
-      <MemoryManager memoryKey={memoryKey} setMemoryKey={setMemoryKey} memoryValue={memoryValue} setMemoryValue={setMemoryValue} onSave={saveMemory} />
-      <TwitterDraftManager draftText={draftText} setDraftText={setDraftText} onDraft={createTwitterDraft} />
-      <SystemStatus status={status} onRefresh={refresh} />
+      <main className="dashboard">
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Q-Verse Platform</p>
+            <h1>Q-Verse Forge Admin <span>V12.2</span></h1>
+            <p className="muted">Manage providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
+          </div>
+          <div className="user-card"><span className="dot ok"></span> System Online</div>
+        </header>
 
-      {message && (
-        <section style={{ marginTop: 24 }}>
-          <h2>Last Action</h2>
-          <pre style={{ background: "#f5f5f5", padding: 16 }}>{message}</pre>
+        <section className="stats-grid">
+          <div className="stat"><span>Providers</span><strong>{Object.keys(providers).length}</strong><small>Available</small></div>
+          <div className="stat"><span>Projects</span><strong>{Object.keys(projects).length}</strong><small>Active</small></div>
+          <div className="stat"><span>Agents</span><strong>{Object.keys(agents).length}</strong><small>Running</small></div>
+          <div className="stat"><span>Plugins</span><strong>{Object.keys(plugins).length}</strong><small>Installed</small></div>
         </section>
-      )}
-    </main>
+
+        <section className="grid four">
+          <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} providers={providers} />
+          <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} projects={projects} />
+          <AgentManager agentName={agentName} setAgentName={setAgentName} onAdd={addAgent} agents={agents} />
+          <PluginManager pluginName={pluginName} setPluginName={setPluginName} onAdd={addPlugin} plugins={plugins} />
+        </section>
+
+        <section className="grid two">
+          <LiveChatTest chatMessage={chatMessage} setChatMessage={setChatMessage} chatResult={chatResult} onSend={sendChatTest} loading={loading} />
+          <ProviderTest providers={providers} onTest={testProviders} loading={loading} />
+        </section>
+
+        <section className="grid two">
+          <MemoryManager memoryKey={memoryKey} setMemoryKey={setMemoryKey} memoryValue={memoryValue} setMemoryValue={setMemoryValue} onSave={saveMemory} />
+          <TwitterDraftManager draftText={draftText} setDraftText={setDraftText} onDraft={createTwitterDraft} />
+        </section>
+
+        <SystemStatus status={status} onRefresh={refresh} />
+
+        {message && <pre className="last-action">{message}</pre>}
+      </main>
+    </div>
   );
 }
 ''',
@@ -977,12 +1157,83 @@ export default function ForgeAdmin() {
     "frontend/admin/main.jsx": '''import React from "react";
 import { createRoot } from "react-dom/client";
 import ForgeAdmin from "./pages/ForgeAdmin.jsx";
+import "./styles.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ForgeAdmin />
   </React.StrictMode>
 );
+''',
+    "frontend/admin/styles.css": ''':root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #07111f;
+  color: #eef6ff;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top left, #123a68 0, transparent 34%), #07111f; }
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+.app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+.sidebar { border-right: 1px solid rgba(148, 163, 184, 0.16); background: rgba(2, 8, 23, 0.72); backdrop-filter: blur(18px); padding: 24px; position: sticky; top: 0; height: 100vh; }
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+.logo { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, #2563eb, #7c3aed); font-weight: 900; }
+nav { display: grid; gap: 8px; }
+nav a { padding: 12px 14px; border-radius: 12px; color: #aebbd0; text-decoration: none; }
+nav a.active, nav a:hover { background: rgba(37, 99, 235, 0.18); color: #60a5fa; }
+.sidebar-foot { position: absolute; bottom: 24px; left: 24px; right: 24px; padding: 16px; border-top: 1px solid rgba(148, 163, 184, 0.16); color: #aebbd0; }
+.dashboard { padding: 34px; }
+.topbar { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 26px; }
+h1 { margin: 0; font-size: 34px; letter-spacing: -0.04em; }
+h1 span { color: #93c5fd; font-size: 22px; }
+h2 { margin: 0; font-size: 18px; }
+.eyebrow { margin: 0 0 6px; text-transform: uppercase; letter-spacing: 0.12em; color: #60a5fa; font-size: 12px; font-weight: 800; }
+.muted, .hint { color: #aebbd0; margin: 6px 0 0; }
+.user-card, .pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(148, 163, 184, 0.18); background: rgba(15, 23, 42, 0.7); padding: 10px 14px; border-radius: 999px; color: #dbeafe; }
+.pill { font-size: 12px; padding: 7px 10px; }
+.pill.ok, .status.ok { color: #34d399; }
+.pill.warn, .status.warn { color: #fbbf24; }
+.pill.purple { color: #c4b5fd; }
+.dot { width: 10px; height: 10px; border-radius: 999px; display: inline-block; background: #64748b; }
+.dot.ok { background: #34d399; box-shadow: 0 0 18px #34d399; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
+.stats-grid.compact { margin: 16px 0; }
+.stat { border: 1px solid rgba(148, 163, 184, 0.16); background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.62)); border-radius: 16px; padding: 18px; }
+.stat span, .stat small { color: #aebbd0; display: block; }
+.stat strong { display: block; font-size: 30px; margin: 6px 0; }
+.grid { display: grid; gap: 18px; margin-bottom: 18px; }
+.grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.card { border: 1px solid rgba(148, 163, 184, 0.16); background: linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.55)); border-radius: 18px; padding: 20px; box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22); }
+.accent-blue { border-color: rgba(59, 130, 246, 0.32); }
+.accent-green { border-color: rgba(52, 211, 153, 0.28); }
+.accent-purple { border-color: rgba(139, 92, 246, 0.38); }
+.accent-teal { border-color: rgba(45, 212, 191, 0.28); }
+.accent-yellow { border-color: rgba(245, 158, 11, 0.30); }
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.form-row { display: flex; gap: 10px; align-items: center; }
+input, select, textarea { width: 100%; border: 1px solid rgba(148, 163, 184, 0.18); background: rgba(2, 8, 23, 0.55); color: #eef6ff; border-radius: 12px; padding: 12px 13px; outline: none; }
+input:focus, select:focus, textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12); }
+.btn { border: 1px solid rgba(148, 163, 184, 0.18); color: white; background: rgba(15, 23, 42, 0.78); border-radius: 12px; padding: 12px 15px; white-space: nowrap; }
+.btn.primary { background: linear-gradient(135deg, #2563eb, #7c3aed); border: 0; }
+.btn.success { background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.55); color: #34d399; }
+.btn.purple { background: rgba(124, 58, 237, 0.32); border-color: rgba(167, 139, 250, 0.55); color: #ddd6fe; }
+.btn.ghost { color: #bfdbfe; }
+.btn.full { margin-top: 12px; width: 100%; }
+.mini-list { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; }
+.mini-list li, .provider-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; color: #eef6ff; }
+.mini-list b { color: #34d399; font-size: 12px; }
+.chat-window { display: grid; gap: 12px; min-height: 180px; border: 1px solid rgba(148, 163, 184, 0.12); background: rgba(2, 8, 23, 0.36); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+.bubble { max-width: 82%; padding: 14px 16px; border-radius: 16px; line-height: 1.5; }
+.bubble.user { justify-self: end; background: linear-gradient(135deg, #6d28d9, #2563eb); }
+.bubble.bot { justify-self: start; background: rgba(30, 41, 59, 0.9); }
+.provider-table { display: grid; border: 1px solid rgba(148, 163, 184, 0.12); border-radius: 16px; overflow: hidden; }
+.provider-row { padding: 14px; border-bottom: 1px solid rgba(148, 163, 184, 0.10); }
+.provider-row:last-child { border-bottom: 0; }
+.status-json, .last-action { background: #020617; color: #d1fae5; border-radius: 14px; padding: 16px; overflow: auto; max-height: 360px; border: 1px solid rgba(148, 163, 184, 0.14); }
+.last-action { margin-top: 18px; }
+@media (max-width: 1200px) { .app-shell { grid-template-columns: 1fr; } .sidebar { position: relative; height: auto; } .grid.four, .grid.two, .stats-grid { grid-template-columns: 1fr; } }
 ''',
 
     "frontend/admin/index.html": '''<!doctype html>
@@ -1123,6 +1374,8 @@ It scans, repairs, upgrades, hardens and generates the platform layers:
 - Twitter Draft Manager UI
 - Forge Admin Vite App
 - Forge Admin Nginx Deploy Snippet
+- Live Chat Test UI
+- Provider Test UI
 '''
 }
 
@@ -1193,6 +1446,8 @@ def run_compile_checks():
         "integrations/github/GitHubRuntime.py",
         "integrations/telegram/TelegramRuntime.py",
         "ai/response/AIResponseEngine.py",
+        "frontend/admin/components/LiveChatTest.jsx",
+        "frontend/admin/components/ProviderTest.jsx",
     ]
     results = {}
     for item in checks:

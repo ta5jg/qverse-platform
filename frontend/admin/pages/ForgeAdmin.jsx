@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import AgentManager from "../components/AgentManager.jsx";
+import LiveChatTest from "../components/LiveChatTest.jsx";
 import MemoryManager from "../components/MemoryManager.jsx";
 import PluginManager from "../components/PluginManager.jsx";
 import ProjectManager from "../components/ProjectManager.jsx";
 import ProviderManager from "../components/ProviderManager.jsx";
+import ProviderTest from "../components/ProviderTest.jsx";
 import SystemStatus from "../components/SystemStatus.jsx";
 import TwitterDraftManager from "../components/TwitterDraftManager.jsx";
 
@@ -20,6 +22,14 @@ export default function ForgeAdmin() {
   const [memoryValue, setMemoryValue] = useState("");
   const [draftText, setDraftText] = useState("");
   const [message, setMessage] = useState("");
+  const [chatMessage, setChatMessage] = useState("Bu cevabı hangi provider üretiyor?");
+  const [chatResult, setChatResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const providers = status?.provider_admin || {};
+  const projects = status?.projects || {};
+  const agents = status?.agents || {};
+  const plugins = status?.plugins || {};
 
   async function refresh() {
     const res = await fetch(`${API_BASE}/forge/status`);
@@ -44,17 +54,17 @@ export default function ForgeAdmin() {
   }
 
   async function addProject() {
-    await postJson("/forge/projects", { name: projectName, config: { source: "admin" } });
+    await postJson("/forge/projects", { name: projectName, config: { source: "admin", status: "active" } });
     setProjectName("");
   }
 
   async function addAgent() {
-    await postJson("/forge/agents", { name: agentName, config: { source: "admin" } });
+    await postJson("/forge/agents", { name: agentName, config: { source: "admin", status: "running" } });
     setAgentName("");
   }
 
   async function addPlugin() {
-    await postJson("/forge/plugins", { name: pluginName, config: { source: "admin" } });
+    await postJson("/forge/plugins", { name: pluginName, config: { source: "admin", enabled: true } });
     setPluginName("");
   }
 
@@ -69,27 +79,82 @@ export default function ForgeAdmin() {
     setDraftText("");
   }
 
+  async function sendChatTest() {
+    setLoading(true);
+    try {
+      const data = await postJson("/agents/chat", { message: chatMessage, source: "forge-admin", user_id: "admin" });
+      setChatResult(data);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function testProviders() {
+    setLoading(true);
+    try {
+      await sendChatTest();
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => { refresh(); }, []);
 
   return (
-    <main style={{ padding: 24, fontFamily: "system-ui", maxWidth: 1100 }}>
-      <h1>Q-Verse Forge Admin V12.1</h1>
-      <p>Manage providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
+    <div className="app-shell">
+      <aside className="sidebar">
+        <div className="brand"><div className="logo">Q</div><strong>Q-Verse Forge</strong></div>
+        <nav>
+          <a className="active">Dashboard</a>
+          <a>Providers</a>
+          <a>Projects</a>
+          <a>Agents</a>
+          <a>Plugins</a>
+          <a>Memory</a>
+          <a>Twitter/X</a>
+          <a>System Status</a>
+        </nav>
+        <div className="sidebar-foot"><span className="dot ok"></span> Ultimate V12.2</div>
+      </aside>
 
-      <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} />
-      <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} />
-      <AgentManager agentName={agentName} setAgentName={setAgentName} onAdd={addAgent} />
-      <PluginManager pluginName={pluginName} setPluginName={setPluginName} onAdd={addPlugin} />
-      <MemoryManager memoryKey={memoryKey} setMemoryKey={setMemoryKey} memoryValue={memoryValue} setMemoryValue={setMemoryValue} onSave={saveMemory} />
-      <TwitterDraftManager draftText={draftText} setDraftText={setDraftText} onDraft={createTwitterDraft} />
-      <SystemStatus status={status} onRefresh={refresh} />
+      <main className="dashboard">
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Q-Verse Platform</p>
+            <h1>Q-Verse Forge Admin <span>V12.2</span></h1>
+            <p className="muted">Manage providers, API keys, projects, agents, plugins, workflows, memory and integrations.</p>
+          </div>
+          <div className="user-card"><span className="dot ok"></span> System Online</div>
+        </header>
 
-      {message && (
-        <section style={{ marginTop: 24 }}>
-          <h2>Last Action</h2>
-          <pre style={{ background: "#f5f5f5", padding: 16 }}>{message}</pre>
+        <section className="stats-grid">
+          <div className="stat"><span>Providers</span><strong>{Object.keys(providers).length}</strong><small>Available</small></div>
+          <div className="stat"><span>Projects</span><strong>{Object.keys(projects).length}</strong><small>Active</small></div>
+          <div className="stat"><span>Agents</span><strong>{Object.keys(agents).length}</strong><small>Running</small></div>
+          <div className="stat"><span>Plugins</span><strong>{Object.keys(plugins).length}</strong><small>Installed</small></div>
         </section>
-      )}
-    </main>
+
+        <section className="grid four">
+          <ProviderManager provider={provider} setProvider={setProvider} apiKey={apiKey} setApiKey={setApiKey} onSave={saveProviderKey} providers={providers} />
+          <ProjectManager projectName={projectName} setProjectName={setProjectName} onAdd={addProject} projects={projects} />
+          <AgentManager agentName={agentName} setAgentName={setAgentName} onAdd={addAgent} agents={agents} />
+          <PluginManager pluginName={pluginName} setPluginName={setPluginName} onAdd={addPlugin} plugins={plugins} />
+        </section>
+
+        <section className="grid two">
+          <LiveChatTest chatMessage={chatMessage} setChatMessage={setChatMessage} chatResult={chatResult} onSend={sendChatTest} loading={loading} />
+          <ProviderTest providers={providers} onTest={testProviders} loading={loading} />
+        </section>
+
+        <section className="grid two">
+          <MemoryManager memoryKey={memoryKey} setMemoryKey={setMemoryKey} memoryValue={memoryValue} setMemoryValue={setMemoryValue} onSave={saveMemory} />
+          <TwitterDraftManager draftText={draftText} setDraftText={setDraftText} onDraft={createTwitterDraft} />
+        </section>
+
+        <SystemStatus status={status} onRefresh={refresh} />
+
+        {message && <pre className="last-action">{message}</pre>}
+      </main>
+    </div>
   );
 }
